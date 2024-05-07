@@ -1,5 +1,5 @@
 {
-  "name": "esa",
+  "name": "linked-data",
   "version": "1.0.0",
   "description": "Fetch Edge Side APIs",
   "author": "soyuka",
@@ -9,8 +9,8 @@
     "typescript": "^5.4.5"
   },
   "workspaces": [
-    "packages/esa",
-    "packages/use-swresa"
+    "packages/ld",
+    "packages/use-swrld"
   ],
   "dependencies": {}
 }

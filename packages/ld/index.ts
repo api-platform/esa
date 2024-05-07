@@ -5,14 +5,14 @@ if (!globalThis.URLPattern) {
 }
 
 
+type Callback<T> = (root: T, options: { iri: string, data: any }) => void;
 type Options<T extends object> = {
   fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
-  callback?: (root: T, options: { iri: string, data: any }) => void;
   root: T;
 };
 
 const table = new Map()
-export default function esa<T extends object>(obj: T, pattern: URLPattern, options: Partial<Options<T>> = {}): T {
+export default function ld<T extends object>(obj: T, pattern: URLPattern, cb?: Callback<T>, options: Partial<Options<T>> = {}): T {
   if (undefined === options.root) {
     table.clear()
     options.root = obj
@@ -27,7 +27,7 @@ export default function esa<T extends object>(obj: T, pattern: URLPattern, optio
       const value = Reflect.get(target, prop, receiver);
 
       if (typeof value === 'object' && value !== null) {
-        return esa<any>(value as any, pattern, options);
+        return ld<any>(value as any, pattern, cb, options);
       }
 
       if (typeof value === 'string' && pattern.test(value)) {
@@ -36,14 +36,14 @@ export default function esa<T extends object>(obj: T, pattern: URLPattern, optio
         }
 
         table.set(value, undefined);
-        ; ((iri, object, cb, t) => {
+        ; ((iri, object, callback, t) => {
           (options as Options<T>).fetchFn(iri).then(data => {
             t.set(iri, data)
-            if (cb) {
-              cb(object, { iri, data })
+            if (callback) {
+              callback(object, { iri, data })
             }
           })
-        })(value, esa((options as Options<T>).root, pattern, options), options.callback, table)
+        })(value, ld((options as Options<T>).root, pattern, cb, options), cb, table)
         return table.get(value)
       }
 

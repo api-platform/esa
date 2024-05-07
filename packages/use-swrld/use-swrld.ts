@@ -1,29 +1,32 @@
-import esa from 'esa';
+/// <reference types="urlpattern-polyfill" />
+import ld from 'ld';
 import useSWR from 'swr'
 import type { SWRConfiguration } from 'swr'
 
 export type fetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 export type Fetcher = (...args: any[]) => Promise<any>
 
-export default function useSWRESA(url: string, pattern: URLPattern, fetcher: Fetcher, config: SWRConfiguration = {}) {
+export default function useSWRLd(url: string, pattern: URLPattern, fetcher: Fetcher, config: SWRConfiguration = {}) {
     if (!fetcher) {
       fetcher = (input: RequestInfo | URL, init?: RequestInit) => fetch(input, init).then(res => res.json())
     }
 
     let cb: any = undefined
-    const esaFetcher = (...args: any[]) => fetcher(...args)
+    const ldFetcher = (...args: any[]) => fetcher(...args)
     .then((data: any) => {
-      return esa(data, pattern, {
-        fetchFn: fetcher as fetchFn,
-        callback: (root) => {
+      return ld(
+        data, 
+        pattern, 
+        (root: any) => {
           cb && cb(root, {optimisticData: root, revalidate: false})
-        }
-      })
+        },
+        { fetchFn: fetcher as fetchFn}
+      )
     })
 
     const res = useSWR(
-      "https://localhost/books",
-      esaFetcher,
+      url,
+      ldFetcher,
       config
     );
 

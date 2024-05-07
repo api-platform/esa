@@ -1,8 +1,8 @@
 {
-  "name": "esa",
+  "name": "use-swrld",
   "version": "1.0.0",
-  "description": "Fetch Edge Side APIs",
-  "main": "index.js",
+  "description": "Fetch Edge Side APIs with SWR",
+  "main": "use-swrld.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
@@ -13,6 +13,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "swr": "^2.2.5",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

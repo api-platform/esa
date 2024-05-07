@@ -3,22 +3,22 @@
 <script type="importmap">
   {
     "imports": {
-      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0"
+      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+      "ld": "https://localhost/ld"
     }
   }
 </script>
 <script type="module">
-  import esa from "/esa";
+  import ld from "ld";
   // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
   const pattern = new URLPattern("/authors/:id", "https://localhost");
-  const fetchFn = (input, init) => fetch(input, init).then(res => res.json())
   const list = document.getElementById('list')
 
   fetch('/books')
     .then((res) => {
       return res.json()
     }).then(async (books) => {
-      const b = esa(books, pattern, {callback: () => {
+      const b = ld(books, pattern, () => {
         const l = []
         b['hydra:member'].forEach((book) => {
           const li = document.createElement('li')
@@ -26,7 +26,7 @@
           l.push(li)
         });
         list.replaceChildren(...l)
-      }})
+      })
 
       b['hydra:member'].forEach((book) => {
         const li = document.createElement('li')

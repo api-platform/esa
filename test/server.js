@@ -27,6 +27,17 @@ function jsonResponse(stream, path) {
 }
 
 server.on('stream', (stream, headers) => {
+  const p = headers[':path']
+
+  if (fs.existsSync(`.${p}.html`)) {
+      stream.respond({
+        ':status': 200,
+        'content-type': 'text/html; charset=utf-8',
+      });
+      pipeline(fs.createReadStream(`.${p}.html`), stream, (err) => err && console.log(err));
+    return;
+  }
+
   switch(headers[':path']) {
     case '/books':
       jsonResponse(stream, './fixtures/books.jsonld')
@@ -49,26 +60,19 @@ server.on('stream', (stream, headers) => {
       });
       pipeline(fs.createReadStream('./index.html'), stream, (err) => err && console.log(err));
       break;
-    case '/react':
-      stream.respond({
-        ':status': 200,
-        'content-type': 'text/html; charset=utf-8',
-      });
-      pipeline(fs.createReadStream('./react.html'), stream, (err) => err && console.log(err));
-      break;
-    case '/esa':
+    case '/ld':
       stream.respond({
         ':status': 200,
         'content-type': 'text/javascript',
       });
-      pipeline(fs.createReadStream('../packages/esa/index.js'), stream, (err) => err && console.log(err));
+      pipeline(fs.createReadStream('../packages/ld/index.js'), stream, (err) => err && console.log(err));
       break;
-    case '/use-swresa':
+    case '/use-swrld':
       stream.respond({
         ':status': 200,
         'content-type': 'text/javascript',
       });
-      pipeline(fs.createReadStream('../packages/use-swresa/use-swresa.js'), stream, (err) => err && console.log(err));
+      pipeline(fs.createReadStream('../packages/use-swrld/use-swrld.js'), stream, (err) => err && console.log(err));
       break;
     default:
       stream.respond({
