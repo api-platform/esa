@@ -1,0 +1,37 @@
+<ul id="list">
+</ul>
+<script type="importmap">
+  {
+    "imports": {
+      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0"
+    }
+  }
+</script>
+<script type="module">
+  import esa from "/esa";
+  // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
+  const pattern = new URLPattern("/authors/:id", "https://localhost");
+  const fetchFn = (input, init) => fetch(input, init).then(res => res.json())
+  const list = document.getElementById('list')
+
+  fetch('/books')
+    .then((res) => {
+      return res.json()
+    }).then(async (books) => {
+      const b = esa(books, pattern, {callback: () => {
+        const l = []
+        b['hydra:member'].forEach((book) => {
+          const li = document.createElement('li')
+          li.innerText = `${book.title} - ${book.author?.name}`
+          l.push(li)
+        });
+        list.replaceChildren(...l)
+      }})
+
+      b['hydra:member'].forEach((book) => {
+        const li = document.createElement('li')
+        li.innerText = `${book.title} - ${book.author?.name}`
+        list.appendChild(li)
+      });
+    })
+</script>

@@ -1,0 +1,18 @@
+{
+  "name": "esa",
+  "version": "1.0.0",
+  "description": "Fetch Edge Side APIs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
+  },
+  "author": "soyuka",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "urlpattern-polyfill": "^10.0.0"
+  }
+}

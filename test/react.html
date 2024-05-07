@@ -1,0 +1,41 @@
+<div id="root"></div>
+<script type="importmap">
+  {
+    "imports": {
+      "@jsxImportSource": "https://esm.sh/react@18.2.0",
+      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+      "swr": "https://esm.sh/swr",
+      "swr/subscription": "https://esm.sh/swr/subscription",
+      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+      "esa": "https://localhost/esa",
+      "use-swresa": "https://localhost/use-swresa"
+    }
+  }
+</script>
+<script type="module" src="https://esm.sh/run"></script>
+<script type="text/jsx">
+  import { createRoot } from "react-dom/client";
+  import useSWRESA from "use-swresa";
+
+  if (!globalThis.URLPattern) { 
+    await import("urlpattern-polyfill");
+  }
+
+  function App() {
+    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const { data: books, isLoading, error } = useSWRESA('https://localhost/books', pattern)
+    if (error) return "An error has occurred.";
+    if (isLoading) return "Loading...";
+
+    return (
+      <ul>
+        {books['hydra:member'].map(b => (<li>{b.title} - {b.author?.name}</li>))}
+      </ul>
+    );
+  }
+
+  const root = createRoot(document.getElementById("root"));
+  root.render(
+    <App />
+  );
+</script>

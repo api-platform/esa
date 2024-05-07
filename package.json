@@ -1,0 +1,16 @@
+{
+  "name": "esa",
+  "version": "1.0.0",
+  "description": "Fetch Edge Side APIs",
+  "author": "soyuka",
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^8.1.2",
+    "typescript": "^5.4.5"
+  },
+  "workspaces": [
+    "packages/esa",
+    "packages/use-swresa"
+  ],
+  "dependencies": {}
+}
