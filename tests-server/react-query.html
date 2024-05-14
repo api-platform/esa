@@ -12,7 +12,7 @@
         "react": "https://esm.sh/react@18.2.0",
         "@tanstack/react-query": "https://esm.sh/@tanstack/react-query?deps=react@18.2.0",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-        "ld": "https://localhost/ld"
+        "ld": "https://localhost/ld.js"
       }
     }
   </script>
@@ -25,6 +25,7 @@
     import ld from "ld";
     import {useEffect} from "react"
     import {createRoot} from "react-dom/client"
+    import {URLPattern} from "urlpattern-polyfill";
     import {
       QueryClient,
       useQuery,
@@ -36,22 +37,24 @@
 
     function Books() {
       const { isPending, error, data: books } = useQuery({
-        queryKey: ['books'],
-        queryFn: () =>
-          fetch('https://localhost/books')
+        queryKey: ['https://localhost/books'],
+        queryFn: ({queryKey}) => {
+          return fetch(queryKey)
           .then((res) => res.json())
           .then((data) => {
-            return ld(data, pattern, (d) => { 
-                queryClient.setQueryData(['books'], d)
+            return ld(data, pattern, (d, {iri, data}) => { 
+                queryClient.setQueryData(queryKey, d)
+                queryClient.setQueryData([iri], data)
             })
-          }),
+          })
+        }
       })
 
       if (isPending) return 'Loading...'
       if (error) return 'An error has occurred: ' + error.message
        return (
          <ul>
-           {books['hydra:member'].map(b => (<li>{b.title} - {b.author?.name}</li>))}
+           {books['hydra:member'].map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
          </ul>
        );
     }

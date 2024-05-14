@@ -6,7 +6,7 @@
       "react": "https://esm.sh/react@18.2.0",
       "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
       "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-      "ld": "https://localhost/ld"
+      "ld": "https://localhost/ld.js"
     }
   }
 </script>
@@ -41,7 +41,7 @@
 
     return (
       <ul>
-        {books['hydra:member']?.map(b => (<li>{b.title} - {b.author?.name}</li>))}
+        {books['hydra:member']?.map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
       </ul>
     );
   }

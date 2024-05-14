@@ -1,16 +1,21 @@
 {
-  "name": "linked-data",
+  "name": "@api-platform/linked-data",
   "version": "1.0.0",
-  "description": "Fetch Edge Side APIs",
+  "description": "Meta package for linked data tools.",
   "author": "soyuka",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "@types/node": "^20.12.11",
     "lerna": "^8.1.2",
     "typescript": "^5.4.5"
   },
   "workspaces": [
     "packages/ld",
-    "packages/use-swrld"
+    "packages/use-swrld",
+    "packages/use-mercure",
+    "packages/mercure"
   ],
-  "dependencies": {}
+  "private": true,
+  "scripts": {}
 }

@@ -1,8 +1,8 @@
 {
-  "name": "@api-platform/ld",
+  "name": "use-mercure",
   "version": "1.0.0",
-  "description": "Fetch Edge Side APIs",
-  "main": "ld.js",
+  "description": "Update state data with mercure",
+  "main": "use-mercure.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"

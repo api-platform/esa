@@ -4,7 +4,6 @@ if (!globalThis.URLPattern) {
   await import("urlpattern-polyfill");
 }
 
-
 type Callback<T> = (root: T, options: { iri: string, data: any }) => void;
 type Options<T extends object> = {
   fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;

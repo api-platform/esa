@@ -4,12 +4,13 @@
   {
     "imports": {
       "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-      "ld": "https://localhost/ld"
+      "ld": "https://localhost/ld.js"
     }
   }
 </script>
 <script type="module">
   import ld from "ld";
+  import {URLPattern} from "urlpattern-polyfill";
   // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
   const pattern = new URLPattern("/authors/:id", "https://localhost");
   const list = document.getElementById('list')
@@ -22,6 +23,7 @@
         const l = []
         b['hydra:member'].forEach((book) => {
           const li = document.createElement('li')
+          li.dataset.testid = 'book'
           li.innerText = `${book.title} - ${book.author?.name}`
           l.push(li)
         });
@@ -30,6 +32,7 @@
 
       b['hydra:member'].forEach((book) => {
         const li = document.createElement('li')
+        li.dataset.testid = 'book'
         li.innerText = `${book.title} - ${book.author?.name}`
         list.appendChild(li)
       });

@@ -1,8 +1,8 @@
 {
-  "name": "@api-platform/ld",
+  "name": "mercure",
   "version": "1.0.0",
-  "description": "Fetch Edge Side APIs",
-  "main": "ld.js",
+  "description": "Mercure handler",
+  "main": "mercure.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
@@ -10,9 +10,11 @@
   "author": "soyuka",
   "license": "MIT",
   "devDependencies": {
+    "@types/eventsource": "^1.1.15",
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "eventsource": "^2.0.2",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

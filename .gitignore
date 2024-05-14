@@ -1,2 +1,7 @@
 node_modules/
 .nx
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/tests-server/mercure.db

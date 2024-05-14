@@ -1,0 +1,38 @@
+{
+	# https://caddyserver.com/docs/caddyfile/directives#sorting-algorithm
+	order mercure after encode
+	order vulcain after reverse_proxy
+}
+
+localhost 
+
+header "Set-Cookie" "mercureAuthorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.NXhzhXJ8VTxiRRW3pAB4EgP7s_guZeibwzAGw3wZ_KY; Secure; HttpOnly; SameSite=Lax; Path=/.well-known/mercure;"
+
+handle /books {
+  header "Link" "<https://localhost/books>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
+  try_files ../fixtures/books.jsonld {path}
+}
+
+handle /authors/* {
+  header "Link" "<https://localhost{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
+  try_files ../fixtures/{path}.jsonld {path}
+}
+
+handle /*.js {
+  root ../packages
+  try_files ./*/{path} {path}
+}
+
+handle /* {
+  try_files ./{path}.html {path}
+}
+
+mercure {
+  publisher_jwt key
+  subscriber_jwt key
+  anonymous true
+  ui true
+}
+
+vulcain
+file_server

@@ -17,15 +17,15 @@ I have an API referencing books and their authors, `GET /books/1` returns:
 }
 ```
 
-Thanks to `esa` you don't need to call `fetch` to get the author data: 
+Thanks to `ld` you don't need to call `fetch` to get the author data: 
 
 ```javascript
-import useSWRESA from "use-swresa";
+import useSWRLd from "use-swrld";
 
 function App() {
   // An URL Pattern is used to filter IRIs we want to reach automatically
   const pattern = new URLPattern("/authors/:id", "https://localhost");
-  const { data: books, isLoading, error } = useSWRESA('https://localhost/books', pattern)
+  const { data: books, isLoading, error } = useSWRLd('https://localhost/books', pattern)
   if (error) return "An error has occurred.";
   if (isLoading) return "Loading...";
 
@@ -39,8 +39,9 @@ function App() {
 
 ## Test
 
-A test server is available, run `sudo node server.js` inside `test/`, then open: 
+A test server is available, run `sudo caddy run` inside `test/`, then open: 
 ```
 https://localhost
 https://localhost/react
+https://localhost/react-query
 ```

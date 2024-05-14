@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mercure</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@jsxImportSource": "https://esm.sh/react@18.2.0",
+        "react-dom/": "https://esm.sh/react-dom@18.2.0/",
+        "react": "https://esm.sh/react@18.2.0",
+        "@tanstack/react-query": "https://esm.sh/@tanstack/react-query?deps=react@18.2.0",
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "eventsource": "https://esm.sh/eventsource",
+        "ld": "https://localhost/ld.js",
+        "@api-platform/mercure": "https://localhost/mercure.js"
+      }
+    }
+  </script>
+  <script type="module" src="https://esm.sh/run"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    import ld from "ld";
+    import mercure from "@api-platform/mercure";
+    import {useState} from "react"
+    import {createRoot} from "react-dom/client"
+    import {URLPattern} from "urlpattern-polyfill";
+    import {
+      QueryClient,
+      useQuery,
+      QueryClientProvider,
+    } from '@tanstack/react-query'
+
+    const queryClient = new QueryClient();
+    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === 'removed') {
+        event.query.queryKey.forEach((queryKey) => {
+          mercure.close(queryKey)
+        })
+      }
+    })
+
+    function Author() {
+      const [id, setId] = useState('https://localhost/authors/1')
+
+      // this sends and update to mercure, API Platform does this under the hood
+      function handleSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const body = new URLSearchParams(formData.entries());
+        // You can pass formData as a fetch body directly:
+        fetch(form.action, { method: form.method, body: body.toString(), headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.NXhzhXJ8VTxiRRW3pAB4EgP7s_guZeibwzAGw3wZ_KY'
+         }
+       });
+      }
+
+      function changeAuthor() {
+        const match = pattern.exec(id)
+        let currentId = parseInt(match.pathname.groups.id)
+        if (currentId === 3) {
+          currentId = 1
+        } else {
+          currentId++
+        }
+        
+        setId(`https://localhost/authors/${currentId}`)
+      }
+
+      const { isPending, error, data: author } = useQuery({
+        gcTime: 100,
+        queryKey: [id],
+        queryFn: ({queryKey}) => {
+          return mercure(queryKey, (d) => queryClient.setQueryData([d['@id']], d))
+          .then(res => res.json())
+        }
+      })
+
+      if (isPending) return 'Loading...'
+      if (error) return 'An error has occurred: ' + error.message
+       return (
+         <div>
+           <p>
+             viewing {id}: {author.name}
+           </p>
+           <form method="POST" action="/.well-known/mercure" onSubmit={handleSubmit}>
+             <input type="hidden" name="topic" defaultValue="https://localhost/authors/1" />
+             <textarea cols="60" rows="2" name="data" defaultValue='{"@id":"https://localhost/authors/1","name":"Soyuka"}'></textarea><br />
+             <button type="submit">Send mercure update</button>
+             <button type="button" onClick={changeAuthor}>Change author</button>
+           </form>
+         </div>
+       );
+    }
+
+    function App() {
+      return (
+        <QueryClientProvider client={queryClient}>
+          <Author />
+        </QueryClientProvider>
+      )
+    }
+    createRoot(root).render(<App />)
+  </script>
+</body>
+</html>
