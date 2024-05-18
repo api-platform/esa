@@ -4,4 +4,4 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-/tests-server/mercure.db
+mercure.db

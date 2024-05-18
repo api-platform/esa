@@ -1,40 +1,48 @@
-<ul id="list">
-</ul>
-<script type="importmap">
-  {
-    "imports": {
-      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-      "ld": "https://localhost/ld.js"
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Linked Data</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "ld": "https://localhost/ld.js"
+      }
     }
-  }
-</script>
-<script type="module">
-  import ld from "ld";
-  import {URLPattern} from "urlpattern-polyfill";
-  // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
-  const pattern = new URLPattern("/authors/:id", "https://localhost");
-  const list = document.getElementById('list')
+  </script>
+</head>
 
-  fetch('/books')
-    .then((res) => {
-      return res.json()
-    }).then(async (books) => {
-      const b = ld(books, pattern, () => {
-        const l = []
-        b['hydra:member'].forEach((book) => {
-          const li = document.createElement('li')
-          li.dataset.testid = 'book'
-          li.innerText = `${book.title} - ${book.author?.name}`
-          l.push(li)
-        });
-        list.replaceChildren(...l)
-      })
+<body>
+  <ul id="list">
+  </ul>
+  <script type="module">
+    import ld from "ld";
+    import {URLPattern} from "urlpattern-polyfill";
+    // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
+    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const list = document.getElementById('list')
 
-      b['hydra:member'].forEach((book) => {
+    function onUpdate(books) {
+      const l = []
+      books['hydra:member'].forEach((book) => {
         const li = document.createElement('li')
         li.dataset.testid = 'book'
         li.innerText = `${book.title} - ${book.author?.name}`
-        list.appendChild(li)
+        l.push(li)
       });
-    })
-</script>
+      list.replaceChildren(...l)
+    }
+
+    ld('/books', {urlPattern: pattern, onUpdate})
+      .then((books) => {
+        books['hydra:member'].forEach((book) => {
+          const li = document.createElement('li')
+          li.dataset.testid = 'book'
+          li.innerText = `${book.title} - ${book.author?.name}`
+          list.appendChild(li)
+        });
+      })
+  </script>
+</body>

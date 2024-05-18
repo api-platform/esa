@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('react query', async ({ page }) => {
+test('tanstack query', async ({ page }) => {
   let num = 0
   page.on('request', request => {
     if (request.url().startsWith('https://localhost/authors')) {
@@ -8,7 +8,7 @@ test('react query', async ({ page }) => {
     }
   })
 
-  await page.goto('https://localhost/react-query');
+  await page.goto('https://localhost/tanstack-query');
   await page.waitForLoadState('networkidle');
   expect(num).toBe(3);
   await expect(page.getByTestId('book')).toHaveCount(4);

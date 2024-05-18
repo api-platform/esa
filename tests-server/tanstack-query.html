@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>React App</title>
+  <title>Tanstack Query</title>
   <script type="importmap">
     {
       "imports": {
@@ -36,27 +36,24 @@
     const pattern = new URLPattern("/authors/:id", "https://localhost");
 
     function Books() {
-      const { isPending, error, data: books } = useQuery({
+      const {isPending, error, data: books} = useQuery({
         queryKey: ['https://localhost/books'],
-        queryFn: ({queryKey}) => {
-          return fetch(queryKey)
-          .then((res) => res.json())
-          .then((data) => {
-            return ld(data, pattern, (d, {iri, data}) => { 
-                queryClient.setQueryData(queryKey, d)
-                queryClient.setQueryData([iri], data)
-            })
-          })
-        }
+        queryFn: ({queryKey}) => ld(queryKey, {
+          urlPattern: pattern,
+          onUpdate: (root, {iri, data}) => {
+            queryClient.setQueryData(queryKey, root)
+            queryClient.setQueryData([iri], data)
+          }
+        })
       })
 
       if (isPending) return 'Loading...'
       if (error) return 'An error has occurred: ' + error.message
-       return (
-         <ul>
-           {books['hydra:member'].map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
-         </ul>
-       );
+      return (
+        <ul>
+          {books['hydra:member'].map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
+        </ul>
+      );
     }
 
     function App() {
@@ -69,4 +66,5 @@
     createRoot(root).render(<App />)
   </script>
 </body>
+
 </html>

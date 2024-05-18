@@ -6,25 +6,33 @@
 
 localhost 
 
+root /srv
+vulcain
+file_server
+
 header "Set-Cookie" "mercureAuthorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.NXhzhXJ8VTxiRRW3pAB4EgP7s_guZeibwzAGw3wZ_KY; Secure; HttpOnly; SameSite=Lax; Path=/.well-known/mercure;"
 
 handle /books {
   header "Link" "<https://localhost/books>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
-  try_files ../fixtures/books.jsonld {path}
+  try_files ./tests-server/fixtures/books.jsonld {path}
 }
 
 handle /authors/* {
   header "Link" "<https://localhost{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
-  try_files ../fixtures/{path}.jsonld {path}
+  try_files ./tests-server/fixtures/{path}.jsonld {path}
 }
 
 handle /*.js {
-  root ../packages
+  root /srv/packages
   try_files ./*/{path} {path}
 }
 
 handle /* {
-  try_files ./{path}.html {path}
+  try_files ./tests-server/{path}.html {path}
+}
+
+handle / {
+  try_files ./tests-server/index.html {path}
 }
 
 mercure {
@@ -33,6 +41,3 @@ mercure {
   anonymous true
   ui true
 }
-
-vulcain
-file_server

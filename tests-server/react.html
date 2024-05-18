@@ -1,17 +1,26 @@
-<div id="root"></div>
-<script type="importmap">
-  {
-    "imports": {
-      "@jsxImportSource": "https://esm.sh/react@18.2.0",
-      "react": "https://esm.sh/react@18.2.0",
-      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-      "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-      "ld": "https://localhost/ld.js"
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Linked Data - React</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@jsxImportSource": "https://esm.sh/react@18.2.0",
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "ld": "https://localhost/ld.js"
+      }
     }
-  }
-</script>
-<script type="module" src="https://esm.sh/run"></script>
-<script type="text/jsx">
+  </script>
+  <script type="module" src="https://esm.sh/run"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/jsx">
   import { useState, useEffect } from "react";
   import { createRoot } from "react-dom/client";
   import ld from "ld";
@@ -27,11 +36,10 @@
     useEffect(() => {
       let ignore = false;
       setBooks({});
-      fetch('https://localhost/books')
-      .then(result => result.json())
-      .then(result => {
+      ld('https://localhost/books', {onUpdate: (books) => setBooks(books), urlPattern: pattern})
+      .then(books => {
         if (!ignore) {
-          setBooks(ld(result, pattern, (books) => setBooks(books)));
+          setBooks(books);
         }
       });
       return () => {
@@ -51,3 +59,6 @@
     <App />
   );
 </script>
+</body>
+
+</html>

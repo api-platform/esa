@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Linked Data</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "@api-platform/ld": "https://localhost/ld.js",
+        "@api-platform/mercure": "https://localhost/mercure.js",
+        "eventsource": "https://esm.sh/eventsource"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <ul id="list">
+  </ul>
+  <script type="module">
+    import ld from "@api-platform/ld";
+    import {URLPattern} from "urlpattern-polyfill";
+    import mercure from "@api-platform/mercure";
+    const fetchFn = (url, opts) => {
+      return 
+
+    ld('https://pr-406-demo.api-platform.com/books', {
+      fetchFn: (url, opts) => mercure(url, (d) => console.log('got update', d)).then((d) => d.json()),
+      onUpdate: () => {},
+      urlPattern: new URLPattern('/books/*', 'https://pr-406-demo.api-platform.com'),
+      relativeURIs: true
+    })
+    .then((books) => {
+      console.log(books['hydra:member'][1].reviews)
+    })
+  </script>
+</body>

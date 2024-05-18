@@ -25,7 +25,7 @@
   <div id="root"></div>
   <script type="text/babel">
     import ld from "ld";
-    import mercure from "@api-platform/mercure";
+    import mercure, { close } from "@api-platform/mercure";
     import {useState} from "react"
     import {createRoot} from "react-dom/client"
     import {URLPattern} from "urlpattern-polyfill";
@@ -40,7 +40,7 @@
     queryClient.getQueryCache().subscribe((event) => {
       if (event.type === 'removed') {
         event.query.queryKey.forEach((queryKey) => {
-          mercure.close(queryKey)
+          close(queryKey)
         })
       }
     })
@@ -62,23 +62,11 @@
        });
       }
 
-      function changeAuthor() {
-        const match = pattern.exec(id)
-        let currentId = parseInt(match.pathname.groups.id)
-        if (currentId === 3) {
-          currentId = 1
-        } else {
-          currentId++
-        }
-        
-        setId(`https://localhost/authors/${currentId}`)
-      }
-
       const { isPending, error, data: author } = useQuery({
-        gcTime: 100,
+        gcTime: 500,
         queryKey: [id],
         queryFn: ({queryKey}) => {
-          return mercure(queryKey, (d) => queryClient.setQueryData([d['@id']], d))
+          return mercure(queryKey, {onUpdate: (d) => queryClient.setQueryData([d['@id']], d)})
           .then(res => res.json())
         }
       })
@@ -87,14 +75,16 @@
       if (error) return 'An error has occurred: ' + error.message
        return (
          <div>
-           <p>
+            <button data-testid="author-1" onClick={() => setId(`https://localhost/authors/1`)}>Author 1</button>
+            <button data-testid="author-2" onClick={() => setId(`https://localhost/authors/2`)}>Author 2</button>
+            <button data-testid="author-3" onClick={() => setId(`https://localhost/authors/3`)}>Author 3</button>
+           <p data-testid="result">
              viewing {id}: {author.name}
            </p>
            <form method="POST" action="/.well-known/mercure" onSubmit={handleSubmit}>
              <input type="hidden" name="topic" defaultValue="https://localhost/authors/1" />
              <textarea cols="60" rows="2" name="data" defaultValue='{"@id":"https://localhost/authors/1","name":"Soyuka"}'></textarea><br />
-             <button type="submit">Send mercure update</button>
-             <button type="button" onClick={changeAuthor}>Change author</button>
+             <button type="submit" data-testid="mercure">Send mercure update</button>
            </form>
          </div>
        );

@@ -3,12 +3,14 @@ let lastEventId: string
 const eventSources = new Map();
 const topics = new Map();
 
-type Callback<T> = (data: T) => void;
-type Options = {
+type Options<T> = {
   rawEvent?: boolean;
+  EventSource?: any;
+  onError?: (error: unknown)  => void;
+  onUpdate?: (data: MessageEvent|T)  => void;
 } & RequestInit;
 
-function listen<T>(mercureUrl: string, options: Options, cb: Callback<T>) {
+function listen<T>(mercureUrl: string, options: Options<T> = {}) {
   if (eventSources.has(mercureUrl)) {
     const eventSource = eventSources.get(mercureUrl)
     eventSource.eventSource.close()
@@ -26,18 +28,20 @@ function listen<T>(mercureUrl: string, options: Options, cb: Callback<T>) {
     headers['Last-Event-Id'] = lastEventId
   }
 
-  const eventSource = new EventSource(url.toString(), { withCredentials: true, headers});
+  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: true, headers});
   eventSource.onmessage = (event: any) => {
     lastEventId = event.lastEventId
-    try {
-      cb(options.rawEvent ? event : JSON.parse(event.data))
-    } catch (e) {
-      // onerror(e)
+    if (options.onUpdate) {
+      try {
+        options.onUpdate(options.rawEvent ? event : JSON.parse(event.data))
+      } catch (e) {
+        options.onError && options.onError(e)
+      }
     }
   }
 
+  eventSource.onerror = options.onError
   eventSources.set(mercureUrl, {
-    cb,
     options: options,
     eventSource: eventSource
   })
@@ -51,15 +55,10 @@ export function close(topic: string) {
   const mercureUrl = topics.get(topic)
   topics.delete(topic)
   const ee = eventSources.get(mercureUrl)
-  listen(mercureUrl, ee.options, ee.cb)
+  listen(mercureUrl, ee.options)
 }
 
-export default function mercure<T>(url: string, opts: Callback<T> | Options, cb: Callback<T>) {
-  if (typeof opts === 'function') {
-    cb = opts
-    opts = {} 
-  }
-
+export default function mercure<T>(url: string, opts: Options<T>) {
   return fetch(url, opts)
     .then((res) => {
       let mercureUrl;
@@ -81,7 +80,7 @@ export default function mercure<T>(url: string, opts: Callback<T> | Options, cb:
 
       if (mercureUrl) {
         topics.set(topic === undefined ? url : topic, mercureUrl)
-        listen(mercureUrl, opts, cb)
+        listen(mercureUrl, opts)
       }
 
       return res;

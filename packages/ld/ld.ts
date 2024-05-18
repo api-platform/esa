@@ -4,21 +4,21 @@ if (!globalThis.URLPattern) {
   await import("urlpattern-polyfill");
 }
 
-type Callback<T> = (root: T, options: { iri: string, data: any }) => void;
-type Options<T extends object> = {
-  fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+export type LdOptions<T extends object> = {
+  fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<T>;
   root: T;
-};
+  urlPattern: URLPattern;
+  relativeURIs: boolean;
+  onUpdate: (root: T, options: { iri: string, data: any }) => void;
+  onError: (err: unknown) => void;
+} & RequestInit;
 
 const table = new Map()
-export default function ld<T extends object>(obj: T, pattern: URLPattern, cb?: Callback<T>, options: Partial<Options<T>> = {}): T {
+
+function proxyfy<T extends object>(obj: T, options: LdOptions<T>): T {
   if (undefined === options.root) {
     table.clear()
     options.root = obj
-  }
-
-  if (undefined === options.fetchFn) {
-    options.fetchFn = (input, init) => fetch(input, init).then(res => res.json())
   }
 
   return new Proxy<T>(obj, {
@@ -26,27 +26,68 @@ export default function ld<T extends object>(obj: T, pattern: URLPattern, cb?: C
       const value = Reflect.get(target, prop, receiver);
 
       if (typeof value === 'object' && value !== null) {
-        return ld<any>(value as any, pattern, cb, options);
+        return proxyfy<any>(value as any, options);
       }
 
-      if (typeof value === 'string' && pattern.test(value)) {
-        if (table.has(value)) {
-          return table.get(value);
+      if (typeof value !== 'string') {
+        return value
+      }
+
+      // TODO: pattern matcher
+      let absoluteValue = undefined
+      if (!options.urlPattern.test(value)) {
+        if (options.relativeURIs === false) {
+          return value;
         }
 
-        table.set(value, undefined);
-        ; ((iri, object, callback, t) => {
-          (options as Options<T>).fetchFn(iri).then(data => {
-            t.set(iri, data)
-            if (callback) {
-              callback(object, { iri, data })
-            }
-          })
-        })(value, ld((options as Options<T>).root, pattern, cb, options), cb, table)
-        return table.get(value)
+        if (value[0] !== '/') {
+          return value;
+        }
+
+        absoluteValue = `${options.urlPattern.protocol}://${options.urlPattern.hostname}${value}`;
+        if (!options.urlPattern.test(absoluteValue)) {
+          return value;
+        }
       }
 
-      return value;
+      if (table.has(value)) {
+        return table.get(value);
+      }
+
+      table.set(value, undefined);
+      ; ((iri, object, t) => {
+        (options as LdOptions<T>).fetchFn(iri)
+        .then(data => {
+          t.set(iri, data)
+          if (options.onUpdate) {
+            options.onUpdate(object, { iri, data })
+          }
+        })
+        .catch((err) => options.onError(err))
+      })(absoluteValue ?? value, proxyfy((options as LdOptions<T>).root, options), table)
+      return table.get(value)
     }
   });
+}
+export default function ld<T extends object>(input: RequestInfo | URL, options: Partial<LdOptions<T>> = {}): Promise<T> {
+  if (!options.urlPattern) {
+    throw new Error('URL Pattern is mandatory.')
+  }
+
+  if (undefined === options.fetchFn) {
+    options.fetchFn = (input, init) => fetch(input, init).then(res => res.json())
+  }
+
+  if (undefined === options.relativeURIs) {
+    options.relativeURIs = false;
+  }
+
+  if (undefined === options.onError) {
+    options.onError = console.error;
+  }
+
+  return options.fetchFn(input, options)
+  .then((d: T) => {
+    return proxyfy<T>(d, options as LdOptions<T>)
+  })
 }

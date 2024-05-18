@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Github</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css" integrity="sha512-h/laqMqQKUXxFuu6aLAaSrXYwGYQ7qk4aYCQ+KJwHZMzAGaEoxMM6h8C+haeJTU1V6E9jrSUnjpEzX23OmV/Aw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism.min.css" integrity="sha512-/mZ1FHPkg6EKcxo0fKXF51ak6Cr2ocgDi5ytaTBjsQZIH/RNs6GF6+oId/vPe3eJB836T36nXwVh/WBl/cWT4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/plugins/line-highlight/prism-line-highlight.min.css" integrity="sha512-C8oHCUM4bDBqmi+GXg5vQCOjriNXzean+2n2TzTDQoNJDWpjzkkJv5Nl0ZMEQoCKpXrRHpAFztPmClcPCuRdvw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js" integrity="sha512-UOoJElONeUNzQbbKQbjldDf9MwOHqxNz49NNJJ1d90yp+X9edsHyJoAs6O4K19CZGaIdjI5ohK+O2y5lBTW6uQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/plugins/line-highlight/prism-line-highlight.min.js" integrity="sha512-MUsHA6aIEavjYGGEssYHDHg89kcl8lzc5fGblgCw0lWX2gYSq6phdSSrtMkekRwz4juQnlbI+7mCMm5BtWvLbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "@jsxImportSource": "https://esm.sh/react@18.2.0",
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "@api-platform/ld": "https://localhost/ld.js"
+      }
+    }
+  </script>
+  <script type="module" src="https://esm.sh/run"></script>
+  <style>li:after { content: ","; } ul li:last-child:after { content: "";} </style>
+
+</head>
+
+<body style="display: grid; grid-template-columns: 1fr 1fr;">
+  <div style="padding: 1rem" class="markdown-body">
+    <div id="root"></div>
+    <pre><code id="fetch-result" class="language-json"></code></pre>
+  </div>
+  <pre data-line="1,4,12,22" id="code" style="padding: 1rem"><code class="language-javascript">
+  import ld from "@api-platform/ld";
+  import { useState, useEffect } from "react";
+
+  const pattern = new URLPattern("/*", "https://api.github.com");
+  const [repository, setRepository] = useState({});
+  const [showContributors, setShowContributors] = useState(false);
+
+  useEffect(() => {
+    ld('https://api.github.com/repos/api-platform/api-platform', {
+      pattern,
+      onUpdate: (repository) => setRepository(repository)
+    })
+    .then(result => {
+      setRepository(result);
+    });
+  }, []);
+
+  return (
+      &lt;div&gt;
+      &lt;h1&gt;{repository.name} ✨ {repository.stargazers_count}&lt;/h1&gt;
+      &lt;p&gt;{repository.description}&lt;/p&gt;
+      {showContributors ? (
+        &lt;ul&gt;
+          {repository.contributors_url?.map((e) =&gt; (&lt;li&gt;{e.login}&lt;/li&gt;))}
+        &lt;/ul&gt;
+      ) : &lt;button onClick={() =&gt; setShowContributors(true)}&gt;Load contributors&lt;/button&gt;}
+    &lt;/div&gt;
+  );
+  </code></pre>
+  <script type="text/jsx">
+    import { useState, useEffect } from "react";
+    import { createRoot } from "react-dom/client";
+    import ld from "@api-platform/ld";
+
+    function handleSubmit(e) {
+      const body = new URLSearchParams({
+
+      });
+      // You can pass formData as a fetch body directly:
+      fetch(form.action, { method: form.method, body: body.toString(), headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.NXhzhXJ8VTxiRRW3pAB4EgP7s_guZeibwzAGw3wZ_KY'
+       }
+     });
+    }
+
+
+    const fetchResult = document.getElementById('fetch-result')
+    if (!globalThis.URLPattern) { 
+      await import("urlpattern-polyfill");
+    }
+
+    // clean github api result for readability
+    function clean(res) {
+      const t = {}
+
+      Object.keys(res).forEach((k) => {
+        if (['id', 'name', 'description', 'contributors_url', 'created_at', 'updated_at', 'stargazers_count', 'open_issues', 'subscribers_count'].includes(k)) {
+          if (k === 'contributors_url' && typeof res[k] !== 'string') {
+             t[k] = res[k].map((e) => {
+              return {login: e.login, url: e.url}
+            })
+            return
+          }
+
+          t[k] = res[k]
+        }
+      })
+
+      return t
+    }
+
+    function App() {
+      const pattern = new URLPattern("/*", "https://api.github.com");
+      const [repository, setRepository] = useState({});
+      const [showContributors, setShowContributors] = useState(false);
+
+      useEffect(() => {
+        let ignore = false;
+        setRepository({});
+
+        fetch('https://api.github.com/repos/api-platform/api-platform')
+        .then(result => result.json())
+        .then(result => {
+          fetchResult.innerHTML = JSON.stringify(clean(result), null, 2)
+          
+          if (!ignore) {
+            setRepository(ld(result, pattern, (repo) => {
+              setRepository(repo)
+              fetchResult.innerHTML = JSON.stringify(clean(repo), null, 2)
+            }));
+          }
+        });
+        return () => {
+          ignore = true;
+        };
+      }, []);
+
+      return (
+        <div>
+          <h1>{repository.name} ✨ {repository.stargazers_count}</h1>
+          <p>{repository.description}</p>
+          {showContributors ? (
+            <ul style={{width: '40vw'}}>
+              {repository.contributors_url?.map((e) => (<li style={{display: 'inline', paddingRight: '0.2rem'}}>{e.login}</li>))}
+            </ul>
+          ) : <button onClick={() => setShowContributors(true)}>Load contributors</button>}
+        </div>
+      );
+    }
+
+    const root = createRoot(document.getElementById("root"));
+    root.render(
+      <App />
+    );
+  </script>
+</body>
+</html>

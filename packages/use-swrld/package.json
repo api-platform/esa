@@ -1,5 +1,5 @@
 {
-  "name": "use-swrld",
+  "name": "@api-platform/use-swrld",
   "version": "1.0.0",
   "description": "Fetch Edge Side APIs with SWR",
   "main": "use-swrld.js",
