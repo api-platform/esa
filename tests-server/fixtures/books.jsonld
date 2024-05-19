@@ -8,7 +8,7 @@
       "@id": "/books/1ef0b3b9-a2e4-67d6-be9f-a76229238934",
       "@type": ["https://schema.org/Book"],
       "title": "Hyperion",
-      "author": "https://localhost/authors/1",
+      "author": "/authors/1",
       "condition": "https://schema.org/UsedCondition",
       "reviews": "/books/1ef0b3b9-a2e4-67d6-be9f-a76229238934/reviews",
       "rating": 2
@@ -17,7 +17,7 @@
       "@id": "/books/1ef0b3b9-a541-68a8-96ce-a76229238934",
       "@type": ["https://schema.org/Book"],
       "title": "The Silver Mistress",
-      "author": "https://localhost/authors/2",
+      "author": "/authors/2",
       "condition": "https://schema.org/RefurbishedCondition",
       "reviews": "/books/1ef0b3b9-a541-68a8-96ce-a76229238934/reviews",
       "rating": 2
@@ -26,7 +26,7 @@
       "@id": "/books/1ef0b3b9-a551-65c8-acae-a76229238934",
       "@type": ["https://schema.org/Book"],
       "title": "Silver Mistress",
-      "author": "https://localhost/authors/2",
+      "author": "/authors/2",
       "condition": "https://schema.org/DamagedCondition",
       "reviews": "/books/1ef0b3b9-a551-65c8-acae-a76229238934/reviews",
       "rating": 3
@@ -35,7 +35,7 @@
       "@id": "/books/1ef0b3b9-a5f3-6116-a245-a76229238934",
       "@type": ["https://schema.org/Book"],
       "title": "Dragons of Deltora",
-      "author": "https://localhost/authors/3",
+      "author": "/authors/3",
       "condition": "https://schema.org/NewCondition",
       "reviews": "/books/1ef0b3b9-a5f3-6116-a245-a76229238934/reviews",
       "rating": 1

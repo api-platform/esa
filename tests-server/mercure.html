@@ -13,8 +13,8 @@
         "@tanstack/react-query": "https://esm.sh/@tanstack/react-query?deps=react@18.2.0",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
         "eventsource": "https://esm.sh/eventsource",
-        "ld": "https://localhost/ld.js",
-        "@api-platform/mercure": "https://localhost/mercure.js"
+        "@api-platform/ld": "./ld.js",
+        "@api-platform/mercure": "./mercure.js"
       }
     }
   </script>
@@ -24,7 +24,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    import ld from "ld";
+    import ld from "@api-platform/ld";
     import mercure, { close } from "@api-platform/mercure";
     import {useState} from "react"
     import {createRoot} from "react-dom/client"
@@ -36,7 +36,7 @@
     } from '@tanstack/react-query'
 
     const queryClient = new QueryClient();
-    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const pattern = new URLPattern("/authors/:id", window.origin);
     queryClient.getQueryCache().subscribe((event) => {
       if (event.type === 'removed') {
         event.query.queryKey.forEach((queryKey) => {
@@ -46,7 +46,7 @@
     })
 
     function Author() {
-      const [id, setId] = useState('https://localhost/authors/1')
+      const [id, setId] = useState('/authors/1')
 
       // this sends and update to mercure, API Platform does this under the hood
       function handleSubmit(e) {
@@ -75,14 +75,14 @@
       if (error) return 'An error has occurred: ' + error.message
        return (
          <div>
-            <button data-testid="author-1" onClick={() => setId(`https://localhost/authors/1`)}>Author 1</button>
-            <button data-testid="author-2" onClick={() => setId(`https://localhost/authors/2`)}>Author 2</button>
-            <button data-testid="author-3" onClick={() => setId(`https://localhost/authors/3`)}>Author 3</button>
+            <button data-testid="author-1" onClick={() => setId(`/authors/1`)}>Author 1</button>
+            <button data-testid="author-2" onClick={() => setId(`/authors/2`)}>Author 2</button>
+            <button data-testid="author-3" onClick={() => setId(`/authors/3`)}>Author 3</button>
            <p data-testid="result">
              viewing {id}: {author.name}
            </p>
            <form method="POST" action="/.well-known/mercure" onSubmit={handleSubmit}>
-             <input type="hidden" name="topic" defaultValue="https://localhost/authors/1" />
+             <input type="hidden" name="topic" defaultValue="/authors/1" />
              <textarea cols="60" rows="2" name="data" defaultValue='{"@id":"https://localhost/authors/1","name":"Soyuka"}'></textarea><br />
              <button type="submit" data-testid="mercure">Send mercure update</button>
            </form>

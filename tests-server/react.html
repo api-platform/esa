@@ -11,7 +11,7 @@
         "react": "https://esm.sh/react@18.2.0",
         "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-        "ld": "https://localhost/ld.js"
+        "@api-platform/ld": "./ld.js"
       }
     }
   </script>
@@ -23,20 +23,20 @@
   <script type="text/jsx">
   import { useState, useEffect } from "react";
   import { createRoot } from "react-dom/client";
-  import ld from "ld";
+  import ld from "@api-platform/ld";
 
   if (!globalThis.URLPattern) { 
     await import("urlpattern-polyfill");
   }
 
   function App() {
-    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const pattern = new URLPattern("/authors/:id", window.origin);
     const [books, setBooks] = useState({});
 
     useEffect(() => {
       let ignore = false;
       setBooks({});
-      ld('https://localhost/books', {onUpdate: (books) => setBooks(books), urlPattern: pattern})
+      ld('/books', {onUpdate: (books) => setBooks(books), urlPattern: pattern})
       .then(books => {
         if (!ignore) {
           setBooks(books);

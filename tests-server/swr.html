@@ -11,8 +11,8 @@
         "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
         "swr": "https://esm.sh/swr",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-        "@api-platform/ld": "https://localhost/ld.js",
-        "use-swrld": "https://localhost/use-swrld.js"
+        "@api-platform/ld": "./ld.js",
+        "use-swrld": "./use-swrld.js"
       }
     }
   </script>
@@ -30,8 +30,8 @@
     }
 
     function App() {
-      const pattern = new URLPattern("/authors/:id", "https://localhost");
-      const { data: books, isLoading, error } = useSWRLd('https://localhost/books', (url, opts) => fetch(url).then(res => res.json()), {urlPattern: pattern})
+      const pattern = new URLPattern("/authors/:id", window.origin);
+      const { data: books, isLoading, error } = useSWRLd('/books', (url, opts) => fetch(url).then(res => res.json()), {urlPattern: pattern})
       if (error) return "An error has occurred.";
       if (isLoading) return "Loading...";
 

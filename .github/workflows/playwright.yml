@@ -32,8 +32,7 @@ jobs:
       with:
         node-version: lts/*
     - run: npm ci
-    - name: Install dependencies
-      run: lerna run tsc
+    - run: lerna run tsc
     - run: npx playwright install --with-deps
     - run: PLAYWRIGHT_JSON_OUTPUT_NAME=results.json npx playwright test --reporter json
     - uses: daun/playwright-report-summary@v3

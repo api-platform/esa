@@ -8,7 +8,7 @@
     {
       "imports": {
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-        "ld": "https://localhost/ld.js"
+        "@api-platform/ld": "./ld.js"
       }
     }
   </script>
@@ -18,10 +18,10 @@
   <ul id="list">
   </ul>
   <script type="module">
-    import ld from "ld";
+    import ld from "@api-platform/ld";
     import {URLPattern} from "urlpattern-polyfill";
     // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
-    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const pattern = new URLPattern("/authors/:id", window.origin);
     const list = document.getElementById('list')
 
     function onUpdate(books) {

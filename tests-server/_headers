@@ -1,0 +1,15 @@
+https://:project.pages.dev/books
+  Link: <https://:project.pages.dev/books>; rel="self"
+  Link: <https://demo.mercure.rocks/.well-known/mercure>; rel="mercure"
+
+/authors/1
+  Link: <https://:project.pages.dev/authors/1>; rel="self"
+  Link: <https://demo.mercure.rocks/.well-known/mercure>; rel="mercure"
+
+/authors/2
+  Link: <https://:project.pages.dev/authors/2>; rel="self"
+  Link: <https://demo.mercure.rocks/.well-known/mercure>; rel="mercure"
+
+/authors/3
+  Link: <https://:project.pages.dev/authors/3>; rel="self"
+  Link: <https://demo.mercure.rocks/.well-known/mercure>; rel="mercure"

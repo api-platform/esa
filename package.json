@@ -17,5 +17,7 @@
     "packages/mercure"
   ],
   "private": true,
-  "scripts": {}
+  "scripts": {
+    "build": "lerna run tsc && cp packages/*/*.js tests-server/"
+  }
 }

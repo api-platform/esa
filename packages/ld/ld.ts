@@ -55,8 +55,8 @@ function proxyfy<T extends object>(obj: T, options: LdOptions<T>): T {
       }
 
       table.set(value, undefined);
-      ; ((iri, object, t) => {
-        (options as LdOptions<T>).fetchFn(iri)
+      ; ((iri, object, t, uri) => {
+        (options as LdOptions<T>).fetchFn(uri)
         .then(data => {
           t.set(iri, data)
           if (options.onUpdate) {
@@ -64,7 +64,7 @@ function proxyfy<T extends object>(obj: T, options: LdOptions<T>): T {
           }
         })
         .catch((err) => options.onError(err))
-      })(absoluteValue ?? value, proxyfy((options as LdOptions<T>).root, options), table)
+      })(value, proxyfy((options as LdOptions<T>).root, options), table, absoluteValue === undefined ? value : absoluteValue)
       return table.get(value)
     }
   });
@@ -79,7 +79,7 @@ export default function ld<T extends object>(input: RequestInfo | URL, options: 
   }
 
   if (undefined === options.relativeURIs) {
-    options.relativeURIs = false;
+    options.relativeURIs = true;
   }
 
   if (undefined === options.onError) {

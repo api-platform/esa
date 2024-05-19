@@ -1,0 +1,2 @@
+/books /fixtures/books.jsonld 200
+/authors/:id /fixtures/authors/:id.jsonld 200

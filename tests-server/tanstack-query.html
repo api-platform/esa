@@ -12,7 +12,7 @@
         "react": "https://esm.sh/react@18.2.0",
         "@tanstack/react-query": "https://esm.sh/@tanstack/react-query?deps=react@18.2.0",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
-        "ld": "https://localhost/ld.js"
+        "@api-platform/ld": "./ld.js"
       }
     }
   </script>
@@ -22,7 +22,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    import ld from "ld";
+    import ld from "@api-platform/ld";
     import {useEffect} from "react"
     import {createRoot} from "react-dom/client"
     import {URLPattern} from "urlpattern-polyfill";
@@ -33,11 +33,11 @@
     } from '@tanstack/react-query'
 
     const queryClient = new QueryClient();
-    const pattern = new URLPattern("/authors/:id", "https://localhost");
+    const pattern = new URLPattern("/authors/:id", window.origin);
 
     function Books() {
       const {isPending, error, data: books} = useQuery({
-        queryKey: ['https://localhost/books'],
+        queryKey: ['/books'],
         queryFn: ({queryKey}) => ld(queryKey, {
           urlPattern: pattern,
           onUpdate: (root, {iri, data}) => {
