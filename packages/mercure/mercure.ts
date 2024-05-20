@@ -6,6 +6,7 @@ const topics = new Map();
 type Options<T> = {
   rawEvent?: boolean;
   EventSource?: any;
+  fetchFn?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
 } & RequestInit;
@@ -58,8 +59,9 @@ export function close(topic: string) {
   listen(mercureUrl, ee.options)
 }
 
+// TODO: close ess when no more topiscs?
 export default function mercure<T>(url: string, opts: Options<T>) {
-  return fetch(url, opts)
+  return (opts.fetchFn ? opts.fetchFn(url, opts) : fetch(url, opts))
     .then((res) => {
       let mercureUrl;
       let topic;

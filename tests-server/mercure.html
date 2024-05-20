@@ -83,7 +83,7 @@
            </p>
            <form method="POST" action="/.well-known/mercure" onSubmit={handleSubmit}>
              <input type="hidden" name="topic" defaultValue="/authors/1" />
-             <textarea cols="60" rows="2" name="data" defaultValue='{"@id":"https://localhost/authors/1","name":"Soyuka"}'></textarea><br />
+             <textarea cols="60" rows="2" name="data" defaultValue='{"@id":"/authors/1","name":"Soyuka"}'></textarea><br />
              <button type="submit" data-testid="mercure">Send mercure update</button>
            </form>
          </div>

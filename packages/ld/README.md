@@ -2,8 +2,6 @@
 
 Rich JSON formats like JSON-LD use IRIs to reference embeded data. This library fetches the wanted URIs automatically.
 
-## React SWR example
-
 I have an API referencing books and their authors, `GET /books/1` returns:
 
 ```json
@@ -15,22 +13,38 @@ I have an API referencing books and their authors, `GET /books/1` returns:
 }
 ```
 
-Thanks to `ld` you don't need to call `fetch` to get the author data: 
+Thanks to `ld` you can load authors automatically when you need them:
 
 ```javascript
-import useSWRLd from "use-swrld";
+import ld from '@api-platform/ld'
 
-function App() {
-  // An URL Pattern is used to filter IRIs we want to reach automatically
-  const pattern = new URLPattern("/authors/:id", "https://localhost");
-  const { data: books, isLoading, error } = useSWRLd('https://localhost/books', pattern)
-  if (error) return "An error has occurred.";
-  if (isLoading) return "Loading...";
+const pattern = new URLPattern("/authors/:id", "https://localhost");
+const books = await ld('/books', {
+    urlPattern: pattern,
+    onUpdate: (newBooks) => {
+        log()
+    }
+})
 
-  return (
-    <ul>
-      {books['hydra:member'].map(b => (<li>{b.title} - {b.author?.name}</li>))}
-    </ul>
-  );
+function log() {
+    console.log(books.author?.name)
 }
+
+log()
 ```
+
+## Options
+
+- `fetchFn` fetch function, defaults to `fetch().then((res) => res.json())`
+- `urlPattern` the url pattern filter 
+- `relativeURIs` supports relative URIs (defaults to `true`)
+- `onUpdate: (root, options: { iri: string, data: any })` callback on data update
+- `onError` error callback on fetch errors
+
+## Examples
+
+- [Axios](../../tests-server/axios.html)
+- [React](../../tests-server/react.html)
+- [SWR](../../tests-server/use-swr.html)
+- [Tanstack Query](../../tests-server/tanstack-query.html)
+- [Github API](../../tests-server/github.html)
