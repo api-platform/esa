@@ -5,12 +5,17 @@
   "main": "ld.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ld.ts",
     "tsc": "tsc"
   },
   "author": "soyuka",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "@eslint/js": "^9.3.0",
+    "eslint": "^8.57.0",
+    "globals": "^15.3.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.10.0"
   },
   "dependencies": {
     "urlpattern-polyfill": "^10.0.0"

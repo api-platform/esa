@@ -5,12 +5,17 @@
   "main": "use-swrld.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint use-swrld.ts",
     "tsc": "tsc"
   },
   "author": "soyuka",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "@eslint/js": "^9.3.0",
+    "eslint": "^9.3.0",
+    "globals": "^14.0.0",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.10.0"
   },
   "dependencies": {
     "swr": "^2.2.5",
