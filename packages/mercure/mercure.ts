@@ -1,12 +1,12 @@
 /// <reference types="@types/eventsource" />
-import ES from 'eventsource'
+import EventSource from 'eventsource'
 let lastEventId: string
 const eventSources = new Map();
 const topics = new Map();
 
 type Options<T> = {
   rawEvent?: boolean;
-  EventSource?: EventSource;
+  EventSource?: any;
   fetchFn?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
@@ -33,7 +33,7 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     headers['Last-Event-Id'] = lastEventId
   }
 
-  const eventSource = new (options.EventSource ?? ES)(url.toString(), { withCredentials: true, headers});
+  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: true, headers});
   eventSource.onmessage = (event: MessageEvent) => {
     lastEventId = event.lastEventId
     if (options.onUpdate) {
