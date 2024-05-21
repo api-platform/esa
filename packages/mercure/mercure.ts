@@ -1,11 +1,12 @@
-import EventSource from 'eventsource'
+/// <reference types="@types/eventsource" />
+import ES from 'eventsource'
 let lastEventId: string
 const eventSources = new Map();
 const topics = new Map();
 
 type Options<T> = {
   rawEvent?: boolean;
-  EventSource?: any;
+  EventSource?: EventSource;
   fetchFn?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
@@ -18,19 +19,22 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     eventSources.delete(mercureUrl)
   }
 
+  if (topics.size === 0) {
+    return;
+  }
+
   const url = new URL(mercureUrl)
-  topics.forEach((mercureUrl, topic) => {
+  topics.forEach((_, topic) => {
     url.searchParams.append('topic', topic)
   })
-
 
   const headers: {[key: string]: string} = {}
   if (lastEventId) {
     headers['Last-Event-Id'] = lastEventId
   }
 
-  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: true, headers});
-  eventSource.onmessage = (event: any) => {
+  const eventSource = new (options.EventSource ?? ES)(url.toString(), { withCredentials: true, headers});
+  eventSource.onmessage = (event: MessageEvent) => {
     lastEventId = event.lastEventId
     if (options.onUpdate) {
       try {
@@ -59,8 +63,7 @@ export function close(topic: string) {
   listen(mercureUrl, ee.options)
 }
 
-// TODO: close ess when no more topiscs?
-export default function mercure<T>(url: string, opts: Options<T>) {
+export default async function mercure<T>(url: string, opts: Options<T>) {
   return (opts.fetchFn ? opts.fetchFn(url, opts) : fetch(url, opts))
     .then((res) => {
       let mercureUrl;

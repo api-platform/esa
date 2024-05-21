@@ -1,15 +1,10 @@
 /// <reference types="urlpattern-polyfill" />
-// @ts-ignore: Property 'UrlPattern' does not exist 
-if (!globalThis.URLPattern) {
-  await import("urlpattern-polyfill");
-}
-
 export type LdOptions<T extends object> = {
   fetchFn: (input: RequestInfo | URL, init?: RequestInit) => Promise<T>;
   root: T;
   urlPattern: URLPattern;
   relativeURIs: boolean;
-  onUpdate: (root: T, options: { iri: string, data: any }) => void;
+  onUpdate: (root: T, options: { iri: string, data: object }) => void;
   onError: (err: unknown) => void;
 } & RequestInit;
 
@@ -26,7 +21,7 @@ function proxyfy<T extends object>(obj: T, options: LdOptions<T>): T {
       const value = Reflect.get(target, prop, receiver);
 
       if (typeof value === 'object' && value !== null) {
-        return proxyfy<any>(value as any, options);
+        return proxyfy<any>(value, options);
       }
 
       if (typeof value !== 'string') {

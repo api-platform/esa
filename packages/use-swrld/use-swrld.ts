@@ -1,13 +1,13 @@
-/// <reference types="urlpattern-polyfill" />
 import ld, { LdOptions } from '@api-platform/ld';
 import useSWR from 'swr'
-import type { SWRConfiguration } from 'swr'
+import type { SWRConfiguration, KeyedMutator, Data } from 'swr'
 
 export type fetchFn = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 export type Fetcher = (...args: any[]) => Promise<any>
+export type onUpdateCallback<T> = (root: T, options: { iri: string, data: object }) => void;
 
-export default function useSWRLd<T extends Object>(url: string, fetcher: Fetcher, config: Partial<LdOptions<T>>&SWRConfiguration = {}) {
-    let cb: any = undefined
+export default function useSWRLd<T extends object>(url: string, fetcher: Fetcher, config: Partial<LdOptions<T>>&SWRConfiguration = {}) {
+    let cb: undefined|KeyedMutator<Data>  = undefined
 
     const res = useSWR(
       url,
