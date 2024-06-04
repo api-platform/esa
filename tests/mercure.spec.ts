@@ -28,6 +28,7 @@ test('mercure', async ({ page }) => {
   await button.waitFor();
   expect(num).toBe(1);
   expect(requestedMercure).toBe(true);
+  // expect(subscribedToBoth).toBe(true); // TODO: check this part
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/1: Dan Simmons');
   button.click({force: true});
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/1: Soyuka');
@@ -36,4 +37,3 @@ test('mercure', async ({ page }) => {
   await page.waitForTimeout(600); // we set gcTime to 500, tanstack query will clear author 1 from cache, therefore we check that mercure gets updated
   expect(unsubscribedAuthor1).toBe(true);
 });
-
