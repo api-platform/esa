@@ -25,27 +25,22 @@
     const list = document.getElementById('list')
 
     function onUpdate(books) {
-      books['hydra:member'].forEach((book, i) => {
-        // Emulate loading time with a random timeout
-        const delay = (i + 1) * Math.floor(Math.random() * (750 - 250) + 250);
-        setTimeout(() => {
-          const li = list.querySelector(`[data-bookid="${book['@id']}"]`);
-          if (!li) {
-            console.error(`Could not find list item with book id ${book['@id']}!`);
-            return;
-          }
-          li.innerText = `${book.title} - ${book.author?.name}`
-        }, delay);
+      const l = []
+      books['hydra:member'].forEach((book) => {
+        const li = document.createElement('li')
+        li.dataset.testid = 'book'
+        li.innerText = `${book.title} - ${book.author?.name}`
+        l.push(li)
       });
+      list.replaceChildren(...l)
     }
 
     ld('/books', {urlPattern: pattern, onUpdate})
       .then((books) => {
         books['hydra:member'].forEach((book) => {
           const li = document.createElement('li')
-          li.setAttribute('data-bookid', book['@id']);
           li.dataset.testid = 'book'
-          li.innerText = `${book.title} - ${book.author?.name || '(…)'}`
+          li.innerText = `${book.title} - ${book.author?.name}`
           list.appendChild(li)
         });
       })
