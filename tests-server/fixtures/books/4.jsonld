@@ -1,0 +1,8 @@
+{
+  "@id": "/books/4",
+  "@type": ["https://schema.org/Book"],
+  "title": "Dragons of Deltora",
+  "author": "/authors/3",
+  "condition": "https://schema.org/NewCondition",
+  "reviews": "/books/4/reviews"
+}

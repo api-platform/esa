@@ -8,18 +8,22 @@ export type LdOptions<T extends object> = {
   onError: (err: unknown) => void;
 } & RequestInit;
 
-type TableMap<T> = Map<string, T|undefined>;
+type TableMap<T> = Map<string, T | undefined>;
 
-const cachedTable: TableMap<unknown> = new Map()
+export const resources: TableMap<unknown> = new Map()
 
 function proxify<T extends object>(obj: T, options: LdOptions<T>): T {
   if (undefined === options.root) {
-    cachedTable.clear()
+    resources.clear()
     options.root = obj
   }
 
   return new Proxy<T>(obj, {
     get: (target: T, prop: string, receiver: unknown) => {
+      if (prop === 'toJSON') {
+        return () => obj
+      }
+
       const value: string extends keyof T ? T[string] : unknown = Reflect.get(target, prop, receiver);
 
       if (typeof value === 'object' && value !== null) {
@@ -43,32 +47,32 @@ function proxify<T extends object>(obj: T, options: LdOptions<T>): T {
           return valueStr;
         }
 
-        absoluteValue = `${options.urlPattern.protocol}://${options.urlPattern.hostname}${valueStr}`;
+        absoluteValue = `${options.urlPattern.protocol}://${options.urlPattern.hostname}${options.urlPattern.port ? ':'+options.urlPattern.port : ''}${valueStr}`;
         if (!options.urlPattern.test(absoluteValue)) {
           return valueStr;
         }
       }
 
-      if (cachedTable.has(valueStr)) {
-        return cachedTable.get(valueStr);
+      if (resources.has(valueStr)) {
+        return resources.get(valueStr);
       }
 
-      cachedTable.set(valueStr, undefined);
+      resources.set(valueStr, {'@id': valueStr});
 
       const callFetch = (iri: string, object: T, tableMap: TableMap<T>, uri: RequestInfo | URL) => {
         options.fetchFn(uri)
-            .then(data => {
-              tableMap.set(iri, data)
-              if (options.onUpdate) {
-                options.onUpdate(object, {iri, data})
-              }
-            })
-            .catch((err) => options.onError(err))
+          .then(data => {
+            tableMap.set(iri, proxify(data, options))
+            if (options.onUpdate) {
+              options.onUpdate(object, { iri, data })
+            }
+          })
+          .catch((err) => options.onError(err))
       };
 
-      callFetch(valueStr, proxify(options.root, options), cachedTable as TableMap<T>, absoluteValue === undefined ? valueStr : absoluteValue)
+      callFetch(valueStr, proxify(options.root, options), resources as TableMap<T>, absoluteValue === undefined ? valueStr : absoluteValue)
 
-      return cachedTable.get(valueStr)
+      return resources.get(valueStr)
     }
   });
 }

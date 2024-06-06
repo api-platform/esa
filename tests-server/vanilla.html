@@ -21,7 +21,7 @@
     import ld from "@api-platform/ld";
     import {URLPattern} from "urlpattern-polyfill";
     // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
-    const pattern = new URLPattern("/authors/:id", window.origin);
+    const pattern = new URLPattern("/(books|authors)/:id", window.origin);
     const list = document.getElementById('list')
 
     function onUpdate(books) {
@@ -29,7 +29,7 @@
       books['hydra:member'].forEach((book) => {
         const li = document.createElement('li')
         li.dataset.testid = 'book'
-        li.innerText = `${book.title} - ${book.author?.name}`
+        li.innerText = `${book.title} - ${book.author.name}`
         l.push(li)
       });
       list.replaceChildren(...l)
@@ -40,7 +40,7 @@
         books['hydra:member'].forEach((book) => {
           const li = document.createElement('li')
           li.dataset.testid = 'book'
-          li.innerText = `${book.title} - ${book.author?.name}`
+          li.innerText = `${book.title} - ${book.author.name}`
           list.appendChild(li)
         });
       })

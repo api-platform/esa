@@ -7,9 +7,11 @@ const topics = new Map();
 type Options<T> = {
   rawEvent?: boolean;
   EventSource?: any;
+  headers?: {[key: string]: string};
   fetchFn?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
+  withCredentials?: bool;
 } & RequestInit;
 
 function listen<T>(mercureUrl: string, options: Options<T> = {}) {
@@ -28,12 +30,12 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     url.searchParams.append('topic', topic)
   })
 
-  const headers: {[key: string]: string} = {}
+  const headers: {[key: string]: string} = options.headers || {}
   if (lastEventId) {
     headers['Last-Event-Id'] = lastEventId
   }
 
-  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: true, headers});
+  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: options.withCredentials !== undefined ? options.withCredentials : true, headers});
   eventSource.onmessage = (event: MessageEvent) => {
     lastEventId = event.lastEventId
     if (options.onUpdate) {

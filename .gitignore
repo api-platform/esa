@@ -6,3 +6,4 @@ node_modules/
 /playwright/.cache/
 mercure.db
 /tests-server/*.js
+!tests-server/index.js

@@ -5,10 +5,11 @@
 ```javascript
 import mercure, { close } from "@api-platform/mercure";
 
-const author = await mercure('https://localhost/authors/1', {
+const res = await mercure('https://localhost/authors/1', {
     onUpdate: (author) => console.log(author)
 })
-.then(res => res.json())
+
+const author = res.then(res => res.json())
 
 
 // Close if you need to 

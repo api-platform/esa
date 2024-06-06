@@ -33,7 +33,7 @@
     } from '@tanstack/react-query'
 
     const queryClient = new QueryClient();
-    const pattern = new URLPattern("/authors/:id", window.origin);
+    const pattern = new URLPattern("/(books|authors)/:id", window.origin);
 
     function Books() {
       const {isPending, error, data: books} = useQuery({
