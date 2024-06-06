@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge side APIs</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preload" href="books" as="fetch" type="application/ld+json" crossorigin />
+  <script type="importmap">
+    {
+      "imports": {
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
+        "@api-platform/ld": "./ld.js",
+        "eventsource": "https://esm.sh/eventsource",
+        "@api-platform/mercure": "./mercure.js",
+        "@tailwindcss/forms": "https://esm.sh/@tailwindcss/forms"
+      }
+    }
+  </script>
+</head>
+
+<body class="text-black">
+  <header class="py-6">
+    <div class="container mx-auto flex justify-between items-center px-6">
+      <div class="flex items-center">
+        <h1 class="text-2xl font-semibold ml-3">Edge Side APIs</h1>
+      </div>
+      <nav class="hidden md:flex space-x-6">
+        <a href="#" class="hover:text-gray-300">Docs</a>
+        <a href="#" class="hover:text-gray-300">GitHub</a>
+      </nav>
+      <div class="md:hidden">
+        <button class="focus:outline-none">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="container mx-auto px-6 py-12">
+    <div class="flex h-screen">
+      <div class="flex-1 overflow-y-auto">
+        <div class="p-4">
+          <ul class="mx-auto space-y-4">
+            <li class="p-4 rounded-lg">
+              <h2 class="text-2xl font-bold">Atomic resource</h2>
+              <p class="text-gray-900">
+                Resources served by the API must be small, atomic documents. The API must not embed related resources
+                but
+                instead expose them through an URL. Big resources should be splitted using one-to-one relations
+                exposed by
+                an
+                URL.
+
+                See @api-platform/ld documentation.
+              </p>
+            </li>
+            <li class="p-4 rounded-lg">
+              <h2 class="text-2xl font-bold">Pre-generate</h2>
+              <p class="text-gray-900">This website's API is full static and can be hosted at edge.</p>
+            </li>
+            <li class="p-4 rounded-lg">
+              <h2 class="text-2xl font-bold">HTTP</h2>
+              <p class="text-gray-900">Click on the links to show status codes, benefit from private browser's cache
+                without any configuration.</p>
+            </li>
+            <li class="p-4 rounded-lg">
+              <h2 class="text-2xl font-bold">Preload</h2>
+              <p class="text-gray-900">We preloaded the <code>/books</code> resource on this page.</p>
+            </li>
+            <li class="p-4 rounded-lg">
+              <h2 class="text-2xl font-bold">Push</h2>
+              <p class="text-gray-900">Live updates to every clients</p>
+              <form class="mt-8 max-w-md" onsubmit="handleSubmit(event)">
+                <div class="grid grid-cols-1 gap-6">
+                  <label class="block">
+                    <span class="text-gray-700">Resource to update</span>
+                    <select id="resources" name="topic" onchange="selectResource(event)" class="block w-full mt-1">
+                    </select>
+                  </label>
+                  <label class="block">
+                    <span class="text-gray-700">Data</span>
+                    <textarea id="data" name="data" class="mt-1 block w-full" rows="5"></textarea>
+                  </label>
+                  <button type="submit" class="rounded-lg p-4 bg-gray-100" data-testid="mercure">Update</button>
+                </div>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-5/12 bg-gray-100 p-4">
+        <pre><code id="json"></code></pre>
+      </div>
+    </div>
+  </main>
+  <script type="module" src="index.js"></script>
+</body>
+
+</html>
