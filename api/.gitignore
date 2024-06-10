@@ -7,4 +7,7 @@
 /public/bundles/
 /var/
 /vendor/
+/public/ld.js
+/public/mercure.js
+/public/white-paper.html
 ###< symfony/framework-bundle ###

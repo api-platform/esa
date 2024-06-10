@@ -73,5 +73,9 @@
     try_files ./index.html {path}
   }
 
+  handle /white-paper {
+    try_files ./white-paper.html {path}
+  }
+
 	php_server
 }
