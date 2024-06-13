@@ -10,8 +10,6 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
 			php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
 		fi
-
-    php bin/console app:load-fixtures || true
 	fi
 
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var

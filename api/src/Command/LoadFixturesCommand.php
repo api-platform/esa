@@ -34,6 +34,13 @@ class LoadFixturesCommand extends Command
         $a = $this->managerRegistry->getManagerForClass(Author::class);
         $b = $this->managerRegistry->getManagerForClass(Book::class);
 
+        $cmd = $a->getClassMetadata(Author::class);
+        $connection = $this->managerRegistry->getConnection();
+        $dbPlatform = $connection->getDatabasePlatform();
+        $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
+        $connection->executeUpdate($q);
+
+
         $dan = new Author();
         $dan->setName('Dan Simmons');
         $a->persist($dan);
