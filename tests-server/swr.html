@@ -12,7 +12,8 @@
         "swr": "https://esm.sh/swr",
         "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
         "@api-platform/ld": "./ld.js",
-        "use-swrld": "./use-swrld.js"
+        "use-swrld": "./use-swrld.js",
+        "react": "https://esm.sh/react@18.2.0"
       }
     }
   </script>
@@ -30,14 +31,14 @@
     }
 
     function App() {
-      const pattern = new URLPattern("/authors/:id", window.origin);
+      const pattern = new URLPattern("/(authors|books)/:id", window.origin);
       const { data: books, isLoading, error } = useSWRLd('/books', (url, opts) => fetch(url).then(res => res.json()), {urlPattern: pattern})
       if (error) return "An error has occurred.";
       if (isLoading) return "Loading...";
 
       return (
         <ul>
-          {books['hydra:member'].map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
+          {books.member.map(b => (<li data-testid="book">{b?.title} - {b?.author?.name}</li>))}
         </ul>
       );
     }

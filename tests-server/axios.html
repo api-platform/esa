@@ -21,12 +21,12 @@
     import ld from "@api-platform/ld";
     import {URLPattern} from "urlpattern-polyfill";
     // todo: use polyfill https://github.com/kenchris/urlpattern-polyfill
-    const pattern = new URLPattern("/authors/:id", window.origin);
+    const pattern = new URLPattern("/(books|authors)/:id", window.origin);
     const list = document.getElementById('list')
 
     function onUpdate(books) {
       const l = []
-      books['hydra:member'].forEach((book) => {
+      books.member.forEach((book) => {
         const li = document.createElement('li')
         li.dataset.testid = 'book'
         li.innerText = `${book.title} - ${book.author?.name}`
@@ -37,7 +37,7 @@
 
     ld('/books', {urlPattern: pattern, onUpdate, fetchfn: (url, options) => axios.get(url)})
       .then((books) => {
-        books['hydra:member'].forEach((book) => {
+        books.member.forEach((book) => {
           const li = document.createElement('li')
           li.dataset.testid = 'book'
           li.innerText = `${book.title} - ${book.author?.name}`

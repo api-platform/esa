@@ -1,5 +1,6 @@
 {
   "name": "@api-platform/use-swrld",
+  "private": true,
   "version": "1.0.0",
   "description": "Fetch Edge Side APIs with SWR",
   "main": "use-swrld.js",
@@ -12,12 +13,15 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.3.0",
+    "@types/react": "^18.3.3",
     "eslint": "^9.3.0",
     "globals": "^14.0.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.10.0"
   },
   "dependencies": {
+    "dequal": "^2.0.3",
+    "react": "^18.2.0",
     "swr": "^2.2.5",
     "urlpattern-polyfill": "^10.0.0"
   }

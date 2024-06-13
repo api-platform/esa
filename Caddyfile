@@ -10,20 +10,18 @@ root /srv
 vulcain
 file_server
 
-header "Set-Cookie" "mercureAuthorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjdXJlIjp7InN1YnNjcmliZSI6WyIqIl0sInB1Ymxpc2giOlsiKiJdfX0.NXhzhXJ8VTxiRRW3pAB4EgP7s_guZeibwzAGw3wZ_KY; Secure; HttpOnly; SameSite=Lax; Path=/.well-known/mercure;"
-
 handle /books {
-  header "Link" "</books>; rel=\"self\", <https://mercure.soyuka.me/.well-known/mercure>; rel=\"mercure\""
+  header "Link" "</books>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
   try_files ./tests-server/fixtures/books.jsonld {path}
 }
 
 handle /books/* {
-  header "Link" "<{path}>; rel=\"self\", <https://mercure.soyuka.me/.well-known/mercure>; rel=\"mercure\""
+  header "Link" "<{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
   try_files ./tests-server/fixtures/{path}.jsonld {path}
 }
 
 handle /authors/* {
-  header "Link" "<{path}>; rel=\"self\", <https://mercure.soyuka.me/.well-known/mercure>; rel=\"mercure\""
+  header "Link" "<{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
   try_files ./tests-server/fixtures/{path}.jsonld {path}
 }
 

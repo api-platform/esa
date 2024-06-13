@@ -41,7 +41,7 @@
 
   useEffect(() => {
     ld('https://api.github.com/repos/api-platform/api-platform', {
-      pattern,
+      urlPattern: pattern,
       onUpdate: (repository) => setRepository(repository)
     })
     .then(result => {
@@ -113,16 +113,18 @@
         let ignore = false;
         setRepository({});
 
-        fetch('https://api.github.com/repos/api-platform/api-platform')
-        .then(result => result.json())
-        .then(result => {
-          fetchResult.innerHTML = JSON.stringify(clean(result), null, 2)
-          
-          if (!ignore) {
-            setRepository(ld(result, pattern, (repo) => {
+        ld('https://api.github.com/repos/api-platform/api-platform', {
+            urlPattern: pattern, 
+            onUpdate: (repo) => {
               setRepository(repo)
               fetchResult.innerHTML = JSON.stringify(clean(repo), null, 2)
-            }));
+            }
+          }
+        )
+        .then(result => {
+          fetchResult.innerHTML = JSON.stringify(clean(result), null, 2)
+          if (!ignore) {
+            setRepository(result);
           }
         });
         return () => {

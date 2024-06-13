@@ -26,10 +26,10 @@
 
     function onUpdate(books) {
       const l = []
-      books['hydra:member'].forEach((book) => {
+      books.member.forEach((book) => {
         const li = document.createElement('li')
         li.dataset.testid = 'book'
-        li.innerText = `${book.title} - ${book.author.name}`
+        li.innerText = `${book.title} - ${book.author?.name}`
         l.push(li)
       });
       list.replaceChildren(...l)
@@ -37,10 +37,10 @@
 
     ld('/books', {urlPattern: pattern, onUpdate})
       .then((books) => {
-        books['hydra:member'].forEach((book) => {
+        books.member.forEach((book) => {
           const li = document.createElement('li')
           li.dataset.testid = 'book'
-          li.innerText = `${book.title} - ${book.author.name}`
+          li.innerText = `${book.title} - ${book.author?.name}`
           list.appendChild(li)
         });
       })

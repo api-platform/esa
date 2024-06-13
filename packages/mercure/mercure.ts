@@ -11,7 +11,7 @@ type Options<T> = {
   fetchFn?: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
-  withCredentials?: bool;
+  withCredentials?: boolean;
 } & RequestInit;
 
 function listen<T>(mercureUrl: string, options: Options<T> = {}) {

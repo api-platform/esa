@@ -30,7 +30,7 @@
   }
 
   function App() {
-    const pattern = new URLPattern("/authors/:id", window.origin);
+    const pattern = new URLPattern("/(books|authors)/:id", window.origin);
     const [books, setBooks] = useState({});
 
     useEffect(() => {
@@ -49,7 +49,7 @@
 
     return (
       <ul>
-        {books['hydra:member']?.map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
+        {books.member?.map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
       </ul>
     );
   }

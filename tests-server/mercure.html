@@ -11,9 +11,7 @@
         "react-dom/": "https://esm.sh/react-dom@18.2.0/",
         "react": "https://esm.sh/react@18.2.0",
         "@tanstack/react-query": "https://esm.sh/@tanstack/react-query?deps=react@18.2.0",
-        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.0.0",
         "eventsource": "https://esm.sh/eventsource",
-        "@api-platform/ld": "./ld.js",
         "@api-platform/mercure": "./mercure.js"
       }
     }
@@ -24,11 +22,9 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    import ld from "@api-platform/ld";
     import mercure, { close } from "@api-platform/mercure";
     import {useState} from "react"
     import {createRoot} from "react-dom/client"
-    import {URLPattern} from "urlpattern-polyfill";
     import {
       QueryClient,
       useQuery,
@@ -36,7 +32,6 @@
     } from '@tanstack/react-query'
 
     const queryClient = new QueryClient();
-    const pattern = new URLPattern("/authors/:id", window.origin);
     queryClient.getQueryCache().subscribe((event) => {
       if (event.type === 'removed') {
         event.query.queryKey.forEach((queryKey) => {

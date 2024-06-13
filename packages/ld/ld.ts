@@ -26,6 +26,10 @@ function proxify<T extends object>(obj: T, options: LdOptions<T>): T {
 
       const value: string extends keyof T ? T[string] : unknown = Reflect.get(target, prop, receiver);
 
+      if (typeof value === 'function') {
+        return value;
+      }
+
       if (typeof value === 'object' && value !== null) {
         return proxify<any>(value, options);
       }
@@ -57,7 +61,7 @@ function proxify<T extends object>(obj: T, options: LdOptions<T>): T {
         return resources.get(valueStr);
       }
 
-      resources.set(valueStr, {'@id': valueStr});
+      resources.set(valueStr, {'@id': valueStr})
 
       const callFetch = (iri: string, object: T, tableMap: TableMap<T>, uri: RequestInfo | URL) => {
         options.fetchFn(uri)
@@ -71,7 +75,6 @@ function proxify<T extends object>(obj: T, options: LdOptions<T>): T {
       };
 
       callFetch(valueStr, proxify(options.root, options), resources as TableMap<T>, absoluteValue === undefined ? valueStr : absoluteValue)
-
       return resources.get(valueStr)
     }
   });

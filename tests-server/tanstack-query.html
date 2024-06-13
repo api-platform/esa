@@ -38,11 +38,12 @@
     function Books() {
       const {isPending, error, data: books} = useQuery({
         queryKey: ['/books'],
+        notifyOnChangeProps: 'all',
         queryFn: ({queryKey}) => ld(queryKey, {
           urlPattern: pattern,
           onUpdate: (root, {iri, data}) => {
+
             queryClient.setQueryData(queryKey, root)
-            queryClient.setQueryData([iri], data)
           }
         })
       })
@@ -51,7 +52,7 @@
       if (error) return 'An error has occurred: ' + error.message
       return (
         <ul>
-          {books['hydra:member'].map(b => (<li data-testid="book">{b.title} - {b.author?.name}</li>))}
+          {books.member.map(b => (<li data-testid="book">{b?.title} - {b?.author?.name}</li>))}
         </ul>
       );
     }
