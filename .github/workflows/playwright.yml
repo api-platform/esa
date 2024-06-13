@@ -36,7 +36,7 @@ jobs:
     - run: npx playwright install --with-deps
     - run: PLAYWRIGHT_JSON_OUTPUT_NAME=results.json npx playwright test --reporter json
     - uses: daun/playwright-report-summary@v3
-      if: always()
+		  if: github.event_name == 'pull_request'
       with:
         report-file: results.json
         github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
