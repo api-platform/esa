@@ -1,0 +1,37 @@
+name: Deploy
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+jobs:
+  deploy:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - run: npm ci
+      - run: lerna run tsc
+      - run: cp packages/ld/ld.js api/public/ld.js
+      - run: cp packages/mercure/mercure.js api/public/mercure.js
+      - run: npm i -g showdown
+      - working-directory: api
+        run: |
+          showdown makehtml -i ../WHITEPAPER.md > white-paper.html
+          cat templates/white-paper-head.html white-paper.html templates/white-paper-foot.html > public/white-paper.html
+      - name: Deploy to Staging server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SOURCE: "api/"
+          ARGS: "-rlgoDzvc -i"
+          REMOTE_USER: ${{ secrets.REMOTE_USER }}
+          TARGET: ${{ secrets.REMOTE_TARGET }}
+          SCRIPT_AFTER: |
+            docker compose --env-file .env.local build
+            docker compose --env-file .env.local up -d	
+            docker compose exec php bin/console app:load-fixtures
+
