@@ -1,6 +1,6 @@
 {
   "name": "@api-platform/ld",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "Fetch Edge Side APIs",
   "main": "ld.js",
   "scripts": {
