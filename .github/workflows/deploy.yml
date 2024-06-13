@@ -19,9 +19,7 @@ jobs:
       - run: cp packages/mercure/mercure.js api/public/mercure.js
       - run: npm i -g showdown
       - working-directory: api
-        run: |
-          showdown makehtml -i ../WHITEPAPER.md > white-paper.html
-          cat templates/white-paper-head.html white-paper.html templates/white-paper-foot.html > public/white-paper.html
+        run: make pages
       - name: Deploy to Staging server
         uses: easingthemes/ssh-deploy@main
         with:

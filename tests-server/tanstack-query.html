@@ -42,7 +42,6 @@
         queryFn: ({queryKey}) => ld(queryKey, {
           urlPattern: pattern,
           onUpdate: (root, {iri, data}) => {
-
             queryClient.setQueryData(queryKey, root)
           }
         })

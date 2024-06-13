@@ -35,5 +35,4 @@ A new `EventSource` is created subscribing to the topic `https://localhost/autho
 
 ### Examples
 
-See [our Tanstack query example](../../tests-server/mercure.html).
-
+See [our Tanstack query example](https://github.com/api-platform/esa/blob/main/tests-server/mercure.html) or the source code of our [home page](https://github.com/api-platform/esa/blob/main/api/public/index.js).

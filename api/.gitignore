@@ -1,4 +1,3 @@
-###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -9,4 +8,5 @@
 /public/ld.js
 /public/mercure.js
 /public/white-paper.html
-###< symfony/framework-bundle ###
+/public/linked-data.html
+/public/mercure.html

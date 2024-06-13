@@ -22,6 +22,11 @@
         @apply font-bold;
       }
 
+      h3 {
+        @apply text-1xl;
+        @apply font-bold;
+      }
+
       p {
         @apply p-4;
       }
@@ -34,11 +39,13 @@
   <header class="py-6">
     <div class="container mx-auto flex justify-between items-center px-6">
       <div class="flex items-center">
-        <h1 class="text-2xl font-semibold ml-3">Edge Side APIs</h1>
+        <h1 class="text-2xl font-semibold ml-3"><a href="/">Edge Side APIs</a></h1>
       </div>
       <nav class="hidden md:flex space-x-6">
-        <a href="#" class="hover:text-gray-300">Docs</a>
-        <a href="#" class="hover:text-gray-300">GitHub</a>
+        <a href="/white-paper" class="hover:text-gray-300">White Paper</a>
+        <a href="/linked-data" class="hover:text-gray-300">Linked Data</a>
+        <a href="/mercure" class="hover:text-gray-300">Mercure</a>
+        <a href="https://github.com/api-platform/esa" class="hover:text-gray-300">GitHub</a>
       </nav>
       <div class="md:hidden">
         <button class="focus:outline-none">
