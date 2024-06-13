@@ -34,6 +34,6 @@ jobs:
           SCRIPT_AFTER: |
             cd ${{secrets.REMOTE_TARGET}}
             docker compose --env-file .env.local build
-            docker compose --env-file .env.local up -d	
+            docker compose --env-file .env.local up --wait
             docker compose exec php bin/console app:load-fixtures
 
