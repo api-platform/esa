@@ -1,6 +1,6 @@
 # @api-platform/mercure
 
-`@api-platform/mercure` is an EventSource wrapper that [discovers a Mercure Hub](https://mercure.rocks/spec#discovery) according to the Link headers.
+`@api-platform/mercure` is an EventSource wrapper that [discovers a Mercure Hub](https://mercure.rocks/spec#discovery) according to the Link headers and handles subscription for you.
 
 ```javascript
 import mercure, { close } from "@api-platform/mercure";
@@ -10,7 +10,6 @@ const res = await mercure('https://localhost/authors/1', {
 })
 
 const author = res.then(res => res.json())
-
 
 // Close if you need to 
 history.onpushstate = function(e) {
@@ -27,11 +26,33 @@ Link: <https://localhost/.well-known/mercure>; rel="mercure"
 
 A new `EventSource` is created subscribing to the topic `https://localhost/authors/1` on the Hub `https://localhost/.well-known/mercure`. 
 
-### Options
+## Installation
+
+```shell
+npm install @api-platform/mercure
+```
+
+## Usage
+
+Use `mercure` like [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API):
+
+```javascript
+import mercure, { close } from "@api-platform/mercure";
+
+const res = await mercure('https://localhost/authors/1', {
+    onUpdate: (author) => console.log(author)
+})
+
+const author = res.then(res => res.json())
+```
+
+Available options:
 
 - `onError` on EventSource error callback
 - `EventSource` to provide your own `EventSource` constructor
 - `fetchFn` to provide your own fetch function, it needs to return a response so that we can read headers
+
+This can be used in conjunction with [@api-platform/ld](/linked-data) as the `fetchFn`.
 
 ### Examples
 

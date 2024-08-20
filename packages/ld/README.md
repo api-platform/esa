@@ -1,6 +1,6 @@
-# Linked Data
+# @api-platform/ld
 
-Rich JSON formats like JSON-LD use IRIs to reference embeded data. This library fetches the wanted URIs automatically.
+Rich JSON formats such as JSON-LD use IRIs to reference embeded data. This library fetches the wanted *Linked Data* automatically.
 
 I have an API referencing books and their authors, `GET /books/1` returns:
 
@@ -13,7 +13,7 @@ I have an API referencing books and their authors, `GET /books/1` returns:
 }
 ```
 
-Thanks to `ld` you can load authors automatically when you need them:
+Thanks to `@api-platform/ld` you can load authors automatically when you need them:
 
 ```javascript
 import ld from '@api-platform/ld'
@@ -33,7 +33,23 @@ function log() {
 log()
 ```
 
-## Options
+## Installation
+
+```shell
+npm install @api-platform/ld
+```
+
+## Usage
+
+Use `ld` like [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) and specify the [URLPattern](https://developer.mozilla.org/en-US/docs/Web/API/URLPattern) to match IRIs that are going to be fetched automatically:
+
+```javascript
+import ld from '@api-platform/ld'
+
+await ld('/books', {urlPattern: new URLPattern("/authors/:id", "https://localhost")})
+```
+
+Available options:
 
 - `fetchFn` fetch function, defaults to `fetch().then((res) => res.json())`
 - `urlPattern` the url pattern filter 
