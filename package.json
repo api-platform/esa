@@ -6,8 +6,11 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.44.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
     "@types/node": "^20.12.11",
     "lerna": "^8.1.2",
+    "tailwindcss": "^3.4.5",
     "typescript": "^5.4.5"
   },
   "workspaces": [
@@ -18,6 +21,7 @@
   ],
   "private": true,
   "scripts": {
-    "build": "lerna run tsc && cp packages/*/*.js tests-server/"
+    "build": "lerna run tsc && cp packages/*/*.js tests-server/",
+    "watch": "npx tailwindcss -i ./api/style/input.css -o ./api/public/output.css --watch=always"
   }
 }
