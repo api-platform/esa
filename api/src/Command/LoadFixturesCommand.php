@@ -37,9 +37,16 @@ class LoadFixturesCommand extends Command
         $cmd = $a->getClassMetadata(Author::class);
         $connection = $this->managerRegistry->getConnection();
         $dbPlatform = $connection->getDatabasePlatform();
-        $q = $dbPlatform->getTruncateTableSql($cmd->getTableName());
-        $connection->executeUpdate($q);
 
+        foreach ($a->getRepository(Author::class)->findAll() as $author) {
+            $a->remove($author);
+        }
+        $a->flush();
+
+        foreach ($b->getRepository(Book::class)->findAll() as $book) {
+            $b->remove($book);
+        }
+        $b->flush();
 
         $dan = new Author();
         $dan->setName('Dan Simmons');
