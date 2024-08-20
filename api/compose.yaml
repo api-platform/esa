@@ -20,9 +20,6 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
-      - ./:/app
-      - /app/vendor
-      - /app/var
     ports:
       # HTTP
       - target: 80
