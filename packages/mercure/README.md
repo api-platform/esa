@@ -1,6 +1,6 @@
 # @api-platform/mercure
 
-`@api-platform/mercure` is an EventSource wrapper that [discovers a Mercure Hub](https://mercure.rocks/spec#discovery) according to the Link headers and handles subscription for you.
+`@api-platform/mercure` is an EventSource wrapper that [discovers a Mercure Hub](https://mercure.rocks/spec#discovery) according to the Link headers and handles subscriptions for you.
 
 ```javascript
 import mercure, { close } from "@api-platform/mercure";
@@ -24,7 +24,7 @@ Link: <https://localhost/authors/1>; rel="self"
 Link: <https://localhost/.well-known/mercure>; rel="mercure"
 ```
 
-A new `EventSource` is created subscribing to the topic `https://localhost/authors/1` on the Hub `https://localhost/.well-known/mercure`. 
+A new `EventSource` is created by subscribing to the topic `https://localhost/authors/1` on the Hub `https://localhost/.well-known/mercure`. 
 
 ## Installation
 
