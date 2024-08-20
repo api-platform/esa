@@ -10,14 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
     - uses: actions/setup-node@v4
       with:
         node-version: 'current'
         registry-url: 'https://registry.npmjs.org'
     - run: npm ci
     - run: lerna run tsc
-    - run: lerna publish --no-private
+    - run: lerna publish from-package --yes --no-private
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
