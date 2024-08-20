@@ -1,7 +1,6 @@
 import ld, { resources } from "@api-platform/ld";
 import mercure from "@api-platform/mercure";
 import { URLPattern } from "urlpattern-polyfill";
-import tailwindForm from "@tailwindcss/forms";
 let books = undefined
 
 const pattern = new URLPattern(window.origin+'/(books|authors)/:id')
@@ -30,10 +29,6 @@ ld('/books', { fetchFn: fetchFn, urlPattern: pattern, onUpdate })
     updateView(d)
   })
 
-tailwind.config = {
-  theme: {},
-  plugins: [tailwindForm]
-}
 
 function updateForm() {
   const select = document.getElementById('resources')
