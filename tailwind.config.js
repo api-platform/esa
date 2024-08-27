@@ -7,6 +7,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'mobile-only': { max: '767px' },
+      },
       fontFamily: {
         sans: 'Inter Variable',
       },
