@@ -56,7 +56,8 @@
         </header>
         <main class="container px-4 xl:px-0 mx-auto relative">
             <div class="flex flex-col md:flex-row md:h-screen pt-20">
-                <div class="w-full md:w-[60%] overflow-y-auto pb-4 prose-slate prose-h2:mb-2 prose-h2:mt-8 max-w-none prose">
+                <div class="w-full md:w-[60%] overflow-y-auto pb-4 prose-slate prose-h2:mb-2 prose-h2:mt-8 max-w-none prose"
+                   data-style-demo="w-full md:w-[40%] overflow-y-auto pb-4 prose-slate prose-h2:mb-2 prose-h2:mt-8 max-w-none prose">
                     <ul class="flex flex-col pl-0 pr-8">
                         <li data-hide-demo>
                             <p class="text-slate-600">
@@ -109,7 +110,7 @@
                                     </label>
                                     <label class="block">
                                     <span class="text-slate-500 text-sm">Data</span>
-                                    <textarea id="data" name="data" class="font-mono text-sm mt-1 block w-full border-slate-400 rounded-lg" rows="5"></textarea>
+                                    <textarea id="data" name="data" class="font-mono text-sm mt-1 block w-full border-slate-400 rounded-lg" rows="9"></textarea>
                                     </label>
                                     <button type="submit" class="rounded-lg p-2 bg-cyan-700 text-white font-bold" data-testid="mercure">Update</button>
                                 </div>
@@ -117,9 +118,12 @@
                         </li>
                     </ul>
                 </div>
-                <div class="relative w-full md:w-[40%] mb-8 md:mb-0" >
+                <div class="relative w-full md:w-[40%] mb-8 md:mb-0"
+                      data-style-demo="relative w-full md:w-[60%] mb-8 md:mb-0"
+                  >
                     <!-- calcul largeur : 50vw - (1000 / pourcentage taille)% -->
-                    <div class="bg-slate-100 md:absolute md:top-0 md:bottom-0 md:left-0 md:overflow-y-auto md:w-[calc(50vw-25%)] md:overflow-auto p-8">
+                    <div class="bg-slate-100 md:absolute md:top-0 md:bottom-0 md:left-0 md:overflow-y-auto md:w-[calc(50vw-25%)] md:overflow-auto p-8"
+                      data-style-demo="bg-slate-100 md:absolute md:top-0 md:bottom-0 md:left-0 md:overflow-y-auto md:w-50vw md:overflow-auto p-8">
                         <p data-hide-demo>
                           Welcome! Open a few of these links, you can then update resources using the form at the bottom of the page.
                           <br>
@@ -137,6 +141,7 @@
           const params = new URLSearchParams(window.location.search)
           if (null !== params.get('demo')) {
             [].slice.call(document.querySelectorAll('[data-hide-demo]')).forEach(e => e.style.display = 'none')
+            [].slice.call(document.querySelectorAll('[data-style-demo]')).forEach(e => e.style = e.dataset.styleDemo)
           }
         </script>
     </body>
