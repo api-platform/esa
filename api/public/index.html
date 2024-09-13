@@ -141,7 +141,7 @@
           const params = new URLSearchParams(window.location.search)
           if (null !== params.get('demo')) {
             [].slice.call(document.querySelectorAll('[data-hide-demo]')).forEach(e => e.style.display = 'none')
-            [].slice.call(document.querySelectorAll('[data-style-demo]')).forEach(e => e.style = e.dataset.styleDemo)
+            [].slice.call(document.querySelectorAll('[data-style-demo]')).forEach(e => e.setAttribute('class',  e.dataset.styleDemo))
           }
         </script>
     </body>
