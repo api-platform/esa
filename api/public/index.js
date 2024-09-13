@@ -115,10 +115,10 @@ window.handleSubmit = function(e) {
   const form = e.target;
   const formData = new FormData(form);
   fetch(formData.get('topic'), {
-    method: 'PUT',
+    method: 'PATCH',
     body: formData.get('data'),
     headers: {
-      'Content-Type': 'application/ld+json'
+      'Content-Type': 'application/merge-patch+json'
     }
   })
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1de2fb03ba5b5d8c080e64196555518a",
+    "content-hash": "62aa8b37922dcf864e8f9daee4bf30a6",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -7619,8 +7619,8 @@
     "aliases": [],
     "minimum-stability": "alpha",
     "stability-flags": {
-        "api-platform/symfony": 15,
-        "api-platform/doctrine-orm": 15
+        "api-platform/doctrine-orm": 15,
+        "api-platform/symfony": 15
     },
     "prefer-stable": true,
     "prefer-lowest": false,
