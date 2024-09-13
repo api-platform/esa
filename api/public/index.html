@@ -58,7 +58,7 @@
             <div class="flex flex-col md:flex-row md:h-screen pt-20">
                 <div class="w-full md:w-[60%] overflow-y-auto pb-4 prose-slate prose-h2:mb-2 prose-h2:mt-8 max-w-none prose">
                     <ul class="flex flex-col pl-0 pr-8">
-                        <li>
+                        <li data-hide-demo>
                             <p class="text-slate-600">
                                 Edge Side APIs (ESA) is an architecture pattern, that allows the creation of more reliable, more efficient, and less resource-intensive APIs. This architecture revives the main REST/HATEOAS principles while taking full advantage of the new capabilities provided by the web platform.
                             </p>
@@ -70,7 +70,7 @@
                             </p>
                             <iframe class="speakerdeck-iframe" style="border: 0px; background: rgba(0, 0, 0, 0.1) padding-box; margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" frameborder="0" src="https://speakerdeck.com/player/82b42a9c6de44f3dbaf0e0cc579e9588" title="Edge Side APIs" allowfullscreen="true" data-ratio="1.7777777777777777"></iframe>
                         </li>
-                        <li>
+                        <li data-hide-demo>
                             <h2 class="mt-4">Atomic resource</h2>
                             <p class="text-slate-600 ">
                                 Resources served by the API must be small, atomic documents. The API must not embed related resources
@@ -83,23 +83,23 @@
                                 More informations at the <a href="/linked-data">@api-platform/ld documentation</a>
                             </p>
                         </li>
-                        <li>
+                        <li data-hide-demo>
                             <h2>Pre-generate</h2>
                             <p class="text-slate-600 ">This website's API is full static and can be hosted at edge.</p>
                         </li>
-                        <li>
+                        <li data-hide-demo>
                             <h2>HTTP</h2>
                             <p class="text-slate-600 ">Click on the links to show status codes, benefit from private browser's cache
                                 without any configuration.
                             </p>
                         </li>
-                        <li>
+                        <li data-hide-demo>
                             <h2>Preload</h2>
                             <p class="text-slate-600 ">We preloaded the <code>/books</code> resource on this page.</p>
                         </li>
                         <li>
-                            <h2>Push</h2>
-                            <p class="text-slate-600 ">Live updates to every clients</p>
+                            <h2 data-hide-demo>Push</h2>
+                            <p data-hide-demo class="text-slate-600 ">Live updates to every clients</p>
                             <form class="mt-8 max-w-md" onsubmit="handleSubmit(event)">
                                 <div class="grid grid-cols-1 gap-6">
                                     <label class="block">
@@ -117,13 +117,14 @@
                         </li>
                     </ul>
                 </div>
-                <div class="relative w-full md:w-[40%] mb-8 md:mb-0">
+                <div class="relative w-full md:w-[40%] mb-8 md:mb-0" >
                     <!-- calcul largeur : 50vw - (1000 / pourcentage taille)% -->
-                    <div class="bg-slate-100  md:absolute md:top-0 md:bottom-0 md:left-0 md:overflow-y-auto md:w-[calc(50vw-25%)] md:overflow-auto p-8">
-                        <p>
+                    <div class="bg-slate-100 md:absolute md:top-0 md:bottom-0 md:left-0 md:overflow-y-auto md:w-[calc(50vw-25%)] md:overflow-auto p-8">
+                        <p data-hide-demo>
                           Welcome! Open a few of these links, you can then update resources using the form at the bottom of the page.
                           <br>
                           To understand what happens under the hood, we recommend to open your developer tools on the Network tab.
+                          <br>
                           <br>
                         </p>
                         <pre class="text-sm font-mono leading-relaxed"><code id="json"></code></pre>
@@ -132,5 +133,11 @@
             </div>
         </main>
         <script type="module" src="index.js"></script>
+        <script>
+          const params = new URLSearchParams(window.location.search)
+          if (null !== params.get('demo')) {
+            [].slice.call(document.querySelectorAll('[data-hide-demo]')).forEach(e => e.style.display = 'none')
+          }
+        </script>
     </body>
 </html>
