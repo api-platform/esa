@@ -2,7 +2,7 @@
 
 Edge Side APIs (ESA) is an architecture pattern that allows the creation of more reliable, more efficient, and less resource-intensive APIs.
 
-https://www.esa.com
+https://edge-side-api.rocks/
 
 ## Abstract
 
