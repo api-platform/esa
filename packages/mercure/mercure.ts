@@ -1,5 +1,5 @@
 /// <reference types="@types/eventsource" />
-import * as EventSource from 'eventsource'
+import {EventSource} from 'eventsource'
 let lastEventId: string
 const eventSources = new Map();
 const topics = new Map();
