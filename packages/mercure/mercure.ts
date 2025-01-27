@@ -1,4 +1,3 @@
-/// <reference types="@types/eventsource" />
 import {EventSource} from 'eventsource'
 let lastEventId: string
 const eventSources = new Map();
