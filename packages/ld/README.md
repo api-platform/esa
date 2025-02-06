@@ -33,6 +33,8 @@ function log() {
 log()
 ```
 
+Note that [URLPattern is not yet available widely](https://caniuse.com/?search=urlpattern), we recommend to use [kenchris/urlpattern-polyfill](https://github.com/kenchris/urlpattern-polyfill).
+
 ## Installation
 
 ```shell
