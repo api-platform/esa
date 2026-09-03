@@ -1,7 +1,14 @@
 import {EventSource} from 'eventsource'
-let lastEventId: string
-const eventSources = new Map();
-const topics = new Map();
+
+// Mercure 1.0 encodes the matcher type in the name of the query parameter:
+// bare "match" selects the default "exact" type, "match_urlpattern" selects
+// URL Patterns (WHATWG), which stand for a whole family of topics.
+type MatcherType = 'exact' | 'urlpattern'
+
+const matcherParam: Record<MatcherType, string> = {
+  exact: 'match',
+  urlpattern: 'match_urlpattern',
+}
 
 type Options<T> = {
   rawEvent?: boolean;
@@ -11,23 +18,68 @@ type Options<T> = {
   onError?: (error: unknown)  => void;
   onUpdate?: (data: MessageEvent|T)  => void;
   withCredentials?: boolean;
+  // Subscribe with a URL Pattern instead of the exact "rel=self" topic. Every
+  // resource whose topic this pattern covers then shares a single
+  // subscription: "/authors/:id" replaces one subscription per author.
+  matchUrlPattern?: string;
 } & RequestInit;
 
+type Subscription = {
+  mercureUrl: string;
+  type: MatcherType;
+  // The topics this matcher currently stands for. An exact matcher holds one;
+  // a URL Pattern holds every fetched resource it covers, so the subscription
+  // outlives close() on any single one of them.
+  topics: Set<string>;
+}
+
+let lastEventId: string
+const eventSources = new Map();
+// Matcher (an exact topic, or a URL Pattern) -> the subscription it opens.
+const subscriptions = new Map<string, Subscription>();
+// Topic -> the matcher covering it.
+const matchers = new Map<string, string>();
+
+// Attach the callbacks to a connection. Split out of listen() so a new
+// subscriber joining an existing matcher can refresh them without dropping
+// the stream and reconnecting.
+function bind<T>(entry: {eventSource: any, options: Options<T>}, options: Options<T>) {
+  entry.options = options
+  entry.eventSource.onmessage = (event: MessageEvent) => {
+    lastEventId = event.lastEventId
+    if (options.onUpdate) {
+      try {
+        options.onUpdate(options.rawEvent ? event : JSON.parse(event.data))
+      } catch (e) {
+        options.onError && options.onError(e)
+      }
+    }
+  }
+
+  entry.eventSource.onerror = options.onError
+}
+
 function listen<T>(mercureUrl: string, options: Options<T> = {}) {
-  if (eventSources.has(mercureUrl)) {
-    const eventSource = eventSources.get(mercureUrl)
-    eventSource.eventSource.close()
+  const current = eventSources.get(mercureUrl)
+  if (current) {
+    current.eventSource.close()
     eventSources.delete(mercureUrl)
   }
 
-  if (topics.size === 0) {
+  const url = new URL(mercureUrl)
+  let subscribed = 0
+  subscriptions.forEach((subscription, matcher) => {
+    if (subscription.mercureUrl !== mercureUrl) {
+      return
+    }
+
+    url.searchParams.append(matcherParam[subscription.type], matcher)
+    subscribed++
+  })
+
+  if (subscribed === 0) {
     return;
   }
-
-  const url = new URL(mercureUrl)
-  topics.forEach((_, topic) => {
-    url.searchParams.append('match', topic)
-  })
 
   const headers: {[key: string]: string} = {...options.headers}
   if (lastEventId) {
@@ -42,33 +94,33 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {...init, headers: {...headers, ...init?.headers}}),
     headers,
   });
-  eventSource.onmessage = (event: MessageEvent) => {
-    lastEventId = event.lastEventId
-    if (options.onUpdate) {
-      try {
-        options.onUpdate(options.rawEvent ? event : JSON.parse(event.data))
-      } catch (e) {
-        options.onError && options.onError(e)
-      }
-    }
-  }
-
-  eventSource.onerror = options.onError
-  eventSources.set(mercureUrl, {
-    options: options,
-    eventSource: eventSource
-  })
+  const entry = {options, eventSource}
+  bind(entry, options)
+  eventSources.set(mercureUrl, entry)
 }
 
 export function close(topic: string) {
-  if (!topics.has(topic)) {
+  const matcher = matchers.get(topic)
+  if (matcher === undefined) {
     return
   }
 
-  const mercureUrl = topics.get(topic)
-  topics.delete(topic)
-  const ee = eventSources.get(mercureUrl)
-  listen(mercureUrl, ee.options)
+  matchers.delete(topic)
+
+  const subscription = subscriptions.get(matcher)
+  if (!subscription) {
+    return
+  }
+
+  subscription.topics.delete(topic)
+  // A URL Pattern covers a family: keep the subscription as long as one of its
+  // topics is still in use.
+  if (subscription.topics.size > 0) {
+    return
+  }
+
+  subscriptions.delete(matcher)
+  listen(subscription.mercureUrl, eventSources.get(subscription.mercureUrl)?.options)
 }
 
 export default async function mercure<T>(url: string, opts: Options<T>) {
@@ -91,12 +143,48 @@ export default async function mercure<T>(url: string, opts: Options<T>) {
           }
         });
 
-      if (mercureUrl) {
-        topics.set(topic === undefined ? url : topic, mercureUrl)
-        listen(mercureUrl, opts)
+      if (!mercureUrl) {
+        return res
       }
+
+      topic = topic === undefined ? url : topic
+      const matcher = opts.matchUrlPattern ?? topic
+
+      // Moving a topic from one matcher to another: release the old one first,
+      // otherwise it keeps a topic nothing will ever close.
+      const previous = matchers.get(topic)
+      if (previous !== undefined && previous !== matcher) {
+        close(topic)
+      }
+
+      let subscription = subscriptions.get(matcher)
+      const opened = subscription === undefined
+
+      if (subscription === undefined) {
+        subscription = {
+          mercureUrl,
+          type: opts.matchUrlPattern === undefined ? 'exact' : 'urlpattern',
+          topics: new Set<string>(),
+        }
+        subscriptions.set(matcher, subscription)
+      }
+
+      subscription.topics.add(topic)
+      matchers.set(topic, matcher)
+
+      const entry = eventSources.get(mercureUrl)
+      if (opened || !entry) {
+        listen(mercureUrl, opts)
+
+        return res
+      }
+
+      // The matcher is already subscribed, so this resource needs no new
+      // subscription at all — that is the point of collapsing a family into
+      // one URL Pattern. Refresh the callbacks in place instead of
+      // reconnecting; the latest registration serves the stream.
+      bind(entry, opts)
 
       return res;
     });
 }
-

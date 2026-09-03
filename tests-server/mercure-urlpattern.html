@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mercure URL Pattern</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "eventsource": "https://esm.sh/eventsource",
+        "@api-platform/mercure": "./mercure.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <p data-testid="ready"></p>
+  <button data-testid="publish-1">Update /authors/1</button>
+  <button data-testid="publish-3">Update /authors/3</button>
+  <ul data-testid="received"></ul>
+
+  <script type="module">
+    import mercure from "@api-platform/mercure";
+
+    // Publisher access token for the test hub: RFC 9068, actions ["publish"],
+    // topics [{"match": "*"}]. Same fixture as mercure.html.
+    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6ImF0K2p3dCJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0Ly53ZWxsLWtub3duL21lcmN1cmUiLCJzdWIiOiJlc2EtdGVzdC1zZXJ2ZXIiLCJjbGllbnRfaWQiOiJlc2EtdGVzdC1zZXJ2ZXIiLCJpYXQiOjE3ODg0MjU1MDUsImV4cCI6NDEwMjQ0NDgwMCwiYXV0aG9yaXphdGlvbl9kZXRhaWxzIjpbeyJ0eXBlIjoiaHR0cHM6Ly9tZXJjdXJlLnJvY2tzL2F1dGhvcml6YXRpb24tZGV0YWlsIiwiYWN0aW9ucyI6WyJwdWJsaXNoIl0sInRvcGljcyI6W3sibWF0Y2giOiIqIn1dfV19.825udJ6bE3p1HpZM_1QZ83DVpOTtuvGE_cQvJby7d0k'
+
+    const received = document.querySelector('[data-testid="received"]')
+
+    // An update carries no topic: the SSE frame is only id/event/data. With a
+    // URL Pattern one stream serves a whole family, so the payload is what
+    // tells them apart — here the JSON-LD @id.
+    function onUpdate(author) {
+      const li = document.createElement('li')
+      li.textContent = `${author['@id']}: ${author.name}`
+      received.append(li)
+    }
+
+    // One subscription for every author, instead of one per author.
+    const matchUrlPattern = '/authors/:id'
+
+    await mercure('/authors/1', {matchUrlPattern, onUpdate})
+    // Same family: this must reuse the subscription above, not open a second.
+    await mercure('/authors/2', {matchUrlPattern, onUpdate})
+
+    document.querySelector('[data-testid="ready"]').textContent = 'ready'
+
+    function publish(topic, data) {
+      return fetch('/.well-known/mercure', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: new URLSearchParams({topic, data: JSON.stringify(data)}).toString(),
+      })
+    }
+
+    document.querySelector('[data-testid="publish-1"]')
+      .addEventListener('click', () => publish('/authors/1', {'@id': '/authors/1', name: 'Soyuka'}))
+
+    // /authors/3 was never fetched, so it has no subscription of its own. The
+    // pattern covers it anyway.
+    document.querySelector('[data-testid="publish-3"]')
+      .addEventListener('click', () => publish('/authors/3', {'@id': '/authors/3', name: 'Emily Rodda'}))
+  </script>
+</body>
+
+</html>
