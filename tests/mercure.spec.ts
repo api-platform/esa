@@ -10,15 +10,15 @@ test('mercure', async ({ page }) => {
       num++
     }
 
-    if (request.url().startsWith('https://localhost/.well-known/mercure?topic=%2Fauthors%2F1')) {
+    if (request.url().startsWith('https://localhost/.well-known/mercure?match=%2Fauthors%2F1')) {
       requestedMercure = true
     }
 
-    if (request.url().startsWith('https://localhost/.well-known/mercure?topic=%2Fauthors%2F1&topic=%2Fauthors%2F2')) {
+    if (request.url().startsWith('https://localhost/.well-known/mercure?match=%2Fauthors%2F1&match=%2Fauthors%2F2')) {
       subscribedToBoth = true
     }
 
-    if (request.url().startsWith('https://localhost/.well-known/mercure?topic=%2Fauthors%2F2')) {
+    if (request.url().startsWith('https://localhost/.well-known/mercure?match=%2Fauthors%2F2')) {
       unsubscribedAuthor1 = true
     }
   })

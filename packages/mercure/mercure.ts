@@ -26,7 +26,7 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
 
   const url = new URL(mercureUrl)
   topics.forEach((_, topic) => {
-    url.searchParams.append('topic', topic)
+    url.searchParams.append('match', topic)
   })
 
   const headers: {[key: string]: string} = options.headers || {}
