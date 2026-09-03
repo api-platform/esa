@@ -43,8 +43,17 @@ handle / {
 }
 
 mercure {
-  publisher_jwt key
-  subscriber_jwt key
-  anonymous true
-  ui true
+  anonymous
+
+  resource_identifier https://localhost/.well-known/mercure
+  issuer https://localhost {
+    publisher {
+      jwt key HS256
+    }
+    subscriber {
+      jwt key HS256
+    }
+  }
+
+  debugger
 }
