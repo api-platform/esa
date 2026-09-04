@@ -34,6 +34,8 @@ test('mercure', async ({ page }) => {
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/1: Soyuka');
   page.getByTestId('author-2').click({force: true});
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/2: O\'Donnell, Peter');
+  // Author 1 is still in the tanstack cache, so both topics share one connection.
+  expect(subscribedToBoth).toBe(true);
   // The connection is rebuilt after an update was received, so it resumes from
   // the id of that update.
   const resumed = await Promise.all(resumedRequests);
