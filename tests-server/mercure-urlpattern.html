@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Mercure URL Pattern</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "eventsource": "https://esm.sh/eventsource@5.1.1",
+        "urlpattern-polyfill": "https://esm.sh/urlpattern-polyfill@10.1.0",
+        "@api-platform/mercure": "./mercure.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <p data-testid="family">…</p>
+  <p data-testid="raw">…</p>
+  <p data-testid="errors">0</p>
+  <p data-testid="author-1">…</p>
+  <button data-testid="publish-3">Publish on /pattern-authors/3</button>
+  <button data-testid="publish-text">Publish a text payload</button>
+  <button data-testid="close-fetched">Close the fetched resources</button>
+  <button data-testid="unsubscribe">Unsubscribe from the family</button>
+
+  <script type="module">
+    import mercure, { close, hub } from "@api-platform/mercure";
+
+    const write = (testid, value) => {
+      document.querySelector(`[data-testid="${testid}"]`).textContent = value
+    }
+    const render = (testid) => (author) => write(testid, author.name)
+    const renderTopic = (topic, testid) => (author) => author['@id'] === topic && write(testid, author.name)
+
+    let errors = 0
+    const authors = hub('https://localhost/.well-known/mercure')
+    const matcher = {type: 'urlpattern', value: '/pattern-authors/:id'}
+    const unsubscribe = authors.subscribe(matcher, {
+      onUpdate: render('family'),
+      onError: () => write('errors', ++errors),
+    })
+    authors.subscribe(matcher, {
+      parse: (data) => data,
+      onUpdate: (data) => write('raw', data),
+    })
+
+    const onUpdate = renderTopic('/pattern-authors/1', 'author-1')
+    await mercure('/pattern-authors/1', {onUpdate}).then((res) => res.json()).then(onUpdate)
+    await mercure('/pattern-authors/2', {onUpdate: () => {}}).then((res) => res.json())
+
+    const publish = (topic, data) => fetch('/.well-known/mercure', {
+      method: 'POST',
+      body: new URLSearchParams({topic, data}).toString(),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6ImF0K2p3dCJ9.eyJpc3MiOiJodHRwczovL2xvY2FsaG9zdCIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0Ly53ZWxsLWtub3duL21lcmN1cmUiLCJzdWIiOiJlc2EtdGVzdC1zZXJ2ZXIiLCJleHAiOjQxMDI0NDQ4MDAsImF1dGhvcml6YXRpb25fZGV0YWlscyI6W3sidHlwZSI6Imh0dHBzOi8vbWVyY3VyZS5yb2Nrcy9hdXRob3JpemF0aW9uLWRldGFpbCIsImFjdGlvbnMiOlsicHVibGlzaCJdLCJ0b3BpY3MiOlt7Im1hdGNoIjoiKiJ9XX1dfQ.hALEoYi-0uM3_5sbR7ikeGBw7yfQvSTKJNWS7JF575c'
+      }
+    })
+
+    let published = 0
+    document.querySelector('[data-testid="publish-3"]').addEventListener('click', () => {
+      published++
+      publish('/pattern-authors/3', JSON.stringify({'@id': '/pattern-authors/3', name: `Never fetched ${published}`}))
+    })
+    document.querySelector('[data-testid="publish-text"]').addEventListener('click', () => {
+      publish('/pattern-authors/3', 'a text payload')
+    })
+    document.querySelector('[data-testid="close-fetched"]').addEventListener('click', () => {
+      close('/pattern-authors/1')
+      close('/pattern-authors/2')
+    })
+    document.querySelector('[data-testid="unsubscribe"]').addEventListener('click', unsubscribe)
+  </script>
+</body>
+
+</html>

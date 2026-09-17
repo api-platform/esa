@@ -25,6 +25,16 @@ handle /authors/* {
   try_files ./tests-server/fixtures/{path}.jsonld {path}
 }
 
+handle /typed-authors/* {
+  header "Link" "<{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\"; last-event-id=\"urn:uuid:5e94c686-2c0b-4f9b-958c-92ccc3bbb4eb\"; type=\"author\"; content-type=\"application/ld+json\""
+  try_files ./tests-server/fixtures/{path}.jsonld {path}
+}
+
+handle /pattern-authors/* {
+  header "Link" "<{path}>; rel=\"self\", <https://localhost/.well-known/mercure>; rel=\"mercure\""
+  try_files ./tests-server/fixtures/{path}.jsonld {path}
+}
+
 handle /other-authors/* {
   header "Link" "<{path}>; rel=\"self\", <https://localhost:8443/.well-known/mercure>; rel=\"mercure\""
   try_files ./tests-server/fixtures/{path}.jsonld {path}
