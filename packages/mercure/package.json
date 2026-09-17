@@ -18,7 +18,7 @@
     "typescript-eslint": "^7.10.0"
   },
   "dependencies": {
-    "eventsource": "^3.0.2",
+    "eventsource": "^5.1.1",
     "urlpattern-polyfill": "^10.0.0"
   },
   "homepage": "https://edge-side-api.rocks/mercure"

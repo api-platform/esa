@@ -10,10 +10,10 @@ FROM dunglas/frankenphp:1-php8.3 AS frankenphp_upstream
 # Custom FrankenPHP binary
 #
 # The stock image embeds Mercure 0.24.2, which speaks 0.x only and rejects a 1.0
-# configuration outright, so the binary is rebuilt against the 1.0 module. Two
-# things make this cheap rather than a fork: the builder image ships Go 1.26.7,
-# the floor mercure/caddy@v1.0.0-alpha.3 declares, and FrankenPHP already pins
-# Caddy 2.11.4, the version that module wants.
+# configuration outright, so the binary is rebuilt against the 1.0 module.
+# mercure/caddy@v1.0.0 declares Go 1.27 and the builder image ships 1.26.7 with
+# GOTOOLCHAIN=local, so the build opts into the newer toolchain; FrankenPHP
+# already pins Caddy 2.11.4, the version that module wants.
 #
 # Everything except the two pinned versions is the recipe documented at
 # https://frankenphp.dev/docs/docker/ — the "=./" replacements point xcaddy at
@@ -24,6 +24,7 @@ FROM dunglas/frankenphp:1-builder-php8.3 AS frankenphp_builder
 COPY --from=caddy:2.11.4-builder /usr/bin/xcaddy /usr/bin/xcaddy
 
 RUN CGO_ENABLED=1 \
+	GOTOOLCHAIN=auto \
 	XCADDY_SETCAP=1 \
 	XCADDY_GO_BUILD_FLAGS="-ldflags='-w -s' -tags=nobadger,nomysql,nopgx" \
 	CGO_CFLAGS=$(php-config --includes) \
@@ -33,7 +34,7 @@ RUN CGO_ENABLED=1 \
 		--with github.com/dunglas/frankenphp=./ \
 		--with github.com/dunglas/frankenphp/caddy=./caddy/ \
 		--with github.com/dunglas/caddy-cbrotli \
-		--with github.com/dunglas/mercure/caddy@v1.0.0-alpha.3 \
+		--with github.com/dunglas/mercure/caddy@v1.0.0 \
 		--with github.com/dunglas/vulcain/caddy@v1.4.3
 
 
