@@ -5,6 +5,7 @@ test('mercure', async ({ page }) => {
   let requestedMercure = false
   let subscribedToBoth = false
   let unsubscribedAuthor1 = false
+  const resumedRequests: Promise<Record<string, string>>[] = []
   page.on('request', request => {
     if (request.url().startsWith('https://localhost/authors')) {
       num++
@@ -16,6 +17,7 @@ test('mercure', async ({ page }) => {
 
     if (request.url().startsWith('https://localhost/.well-known/mercure?match=%2Fauthors%2F1&match=%2Fauthors%2F2')) {
       subscribedToBoth = true
+      resumedRequests.push(request.allHeaders())
     }
 
     if (request.url().startsWith('https://localhost/.well-known/mercure?match=%2Fauthors%2F2')) {
@@ -32,6 +34,10 @@ test('mercure', async ({ page }) => {
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/1: Soyuka');
   page.getByTestId('author-2').click({force: true});
   await expect(page.getByTestId('result')).toHaveText('viewing /authors/2: O\'Donnell, Peter');
+  // The connection is rebuilt after an update was received, so it resumes from
+  // the id of that update.
+  const resumed = await Promise.all(resumedRequests);
+  expect(resumed.some((headers) => headers['last-event-id'] !== undefined)).toBe(true);
   await page.waitForTimeout(600); // we set gcTime to 500, tanstack query will clear author 1 from cache, therefore we check that mercure gets updated
   expect(unsubscribedAuthor1).toBe(true);
 });

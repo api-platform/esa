@@ -29,12 +29,19 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     url.searchParams.append('match', topic)
   })
 
-  const headers: {[key: string]: string} = options.headers || {}
+  const headers: {[key: string]: string} = {...options.headers}
   if (lastEventId) {
-    headers['Last-Event-Id'] = lastEventId
+    headers['Last-Event-ID'] = lastEventId
   }
 
-  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: options.withCredentials !== undefined ? options.withCredentials : true, headers});
+  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), {
+    withCredentials: options.withCredentials !== undefined ? options.withCredentials : true,
+    // eventsource takes no headers option, only a fetch to wrap. The order
+    // matters: on the reconnections it performs on its own it sets its own
+    // Last-Event-ID, which is fresher than the cursor seeded here.
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {...init, headers: {...headers, ...init?.headers}}),
+    headers,
+  });
   eventSource.onmessage = (event: MessageEvent) => {
     lastEventId = event.lastEventId
     if (options.onUpdate) {
