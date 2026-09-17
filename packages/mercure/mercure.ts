@@ -29,12 +29,16 @@ function listen<T>(mercureUrl: string, options: Options<T> = {}) {
     url.searchParams.append('topic', topic)
   })
 
-  const headers: {[key: string]: string} = options.headers || {}
+  const headers: {[key: string]: string} = {...options.headers}
   if (lastEventId) {
-    headers['Last-Event-Id'] = lastEventId
+    headers['Last-Event-ID'] = lastEventId
   }
 
-  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), { withCredentials: options.withCredentials !== undefined ? options.withCredentials : true, headers});
+  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), {
+    withCredentials: options.withCredentials !== undefined ? options.withCredentials : true,
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {...init, headers: {...headers, ...init?.headers}}),
+    headers,
+  });
   eventSource.onmessage = (event: MessageEvent) => {
     lastEventId = event.lastEventId
     if (options.onUpdate) {
