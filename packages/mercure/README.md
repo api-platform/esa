@@ -51,8 +51,38 @@ Available options:
 - `onError` on EventSource error callback
 - `EventSource` to provide your own `EventSource` constructor
 - `fetchFn` to provide your own fetch function, it needs to return a response so that we can read headers
+- `parse` to read the payload yourself, `JSON.parse` by default. A parse error goes to `onError`
+- `rawEvent` to receive the whole `MessageEvent` instead of the payload
 
 This can be used in conjunction with [@api-platform/ld](/linked-data) as the `fetchFn`.
+
+### Subscribing to a family of topics
+
+A hub takes matchers rather than resources, and `subscribe` returns the function that ends the subscription:
+
+```javascript
+import mercure, { hub } from "@api-platform/mercure";
+
+const authors = hub('https://localhost/.well-known/mercure')
+
+const unsubscribe = authors.subscribe({type: 'urlpattern', value: '/authors/:id'}, {
+    onUpdate: (author) => console.log(author)
+})
+```
+
+Every resource you then fetch with `mercure()` that this pattern covers joins that subscription instead of opening one of its own. The family belongs to the caller that asked for it: `close(topic)` on a covered resource removes that callback alone, and the subscription ends when you call the returned function.
+
+The hub matches the pattern, so you also receive updates for topics you never fetched. [URL Patterns](https://mercure.rocks/docs/1.0/concepts/topics-and-matchers) support named groups (`:id`), wildcards (`*`), regular expression constraints and optional segments.
+
+`hub` takes the connection options, `headers`, `withCredentials` and `EventSource`, because they belong to the stream and not to one subscription. `subscribe(hubUrl, matcher, options)` is the same call in one step.
+
+### Discovery
+
+The `rel="mercure"` Link header can carry target attributes, and the client honours two of them.
+`last-event-id` is the identifier of the last event the publisher had dispatched when it generated
+the resource: it goes to the hub as a `last_event_id` query parameter, so an update published
+between that moment and the subscription is not lost. `type` is the Server-Sent Events event type
+the updates carry, and the client listens for it in addition to the default one.
 
 ### One connection per hub
 
