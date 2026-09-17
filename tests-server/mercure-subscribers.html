@@ -23,12 +23,16 @@
   <script type="module">
     import mercure from "@api-platform/mercure";
 
-    const render = (testid) => (author) => {
+    const render = (topic, testid) => (author) => {
+      if (author['@id'] !== topic) {
+        return
+      }
+
       document.querySelector(`[data-testid="${testid}"]`).textContent = author.name
     }
 
     for (const [topic, testid] of [['/authors/1', 'author-1'], ['/authors/2', 'author-2'], ['/other-authors/1', 'other-author-1']]) {
-      const onUpdate = render(testid)
+      const onUpdate = render(topic, testid)
       await mercure(topic, {onUpdate}).then((res) => res.json()).then(onUpdate)
     }
 
