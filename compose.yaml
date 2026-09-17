@@ -17,6 +17,19 @@ services:
       - caddy_data:/data
       - caddy_config:/config
 
+  hub:
+    image: app-server
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+      - "8443:8443/udp"
+    volumes:
+      - ./tests-server/hub.Caddyfile:/etc/caddy/Caddyfile
+      - hub_data:/data
+      - hub_config:/config
+
 volumes:
   caddy_data:
   caddy_config:
+  hub_data:
+  hub_config:

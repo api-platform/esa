@@ -25,6 +25,11 @@ handle /authors/* {
   try_files ./tests-server/fixtures/{path}.jsonld {path}
 }
 
+handle /other-authors/* {
+  header "Link" "<{path}>; rel=\"self\", <https://localhost:8443/.well-known/mercure>; rel=\"mercure\""
+  try_files ./tests-server/fixtures/{path}.jsonld {path}
+}
+
 handle /index.js {
   try_files ./*/{path} {path}
 }

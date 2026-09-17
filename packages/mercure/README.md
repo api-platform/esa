@@ -54,6 +54,12 @@ Available options:
 
 This can be used in conjunction with [@api-platform/ld](/linked-data) as the `fetchFn`.
 
+### One connection per hub
+
+Resources served by the same hub share one connection. An SSE frame does not name a topic, so every callback registered on that hub receives every update, and the payload is what tells them apart. With JSON-LD, dispatch on `@id`.
+
+The connection uses the options of the call that opened it. A later call on the same hub adds its callbacks, but it does not change the credentials, the headers or the `EventSource` implementation of a stream that already runs.
+
 ### Examples
 
 See [our Tanstack query example](https://github.com/api-platform/esa/blob/main/tests-server/mercure.html) or the source code of our [home page](https://github.com/api-platform/esa/blob/main/api/public/index.js).
