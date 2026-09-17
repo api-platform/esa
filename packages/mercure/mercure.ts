@@ -1,7 +1,4 @@
 import {EventSource} from 'eventsource'
-let lastEventId: string
-const eventSources = new Map();
-const topics = new Map();
 
 type Options<T> = {
   rawEvent?: boolean;
@@ -13,59 +10,125 @@ type Options<T> = {
   withCredentials?: boolean;
 } & RequestInit;
 
-function listen<T>(mercureUrl: string, options: Options<T> = {}) {
-  if (eventSources.has(mercureUrl)) {
-    const eventSource = eventSources.get(mercureUrl)
-    eventSource.eventSource.close()
-    eventSources.delete(mercureUrl)
-  }
-
-  if (topics.size === 0) {
-    return;
-  }
-
-  const url = new URL(mercureUrl)
-  topics.forEach((_, topic) => {
-    url.searchParams.append('match', topic)
-  })
-
-  const headers: {[key: string]: string} = {...options.headers}
-  if (lastEventId) {
-    headers['Last-Event-ID'] = lastEventId
-  }
-
-  const eventSource = new (options.EventSource ?? EventSource)(url.toString(), {
-    withCredentials: options.withCredentials !== undefined ? options.withCredentials : true,
-    fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {...init, headers: {...headers, ...init?.headers}}),
-    headers,
-  });
-  eventSource.onmessage = (event: MessageEvent) => {
-    lastEventId = event.lastEventId
-    if (options.onUpdate) {
-      try {
-        options.onUpdate(options.rawEvent ? event : JSON.parse(event.data))
-      } catch (e) {
-        options.onError && options.onError(e)
-      }
-    }
-  }
-
-  eventSource.onerror = options.onError
-  eventSources.set(mercureUrl, {
-    options: options,
-    eventSource: eventSource
-  })
+type Subscriber<T> = {
+  rawEvent?: boolean;
+  onError?: (error: unknown) => void;
+  onUpdate?: (data: MessageEvent|T) => void;
 }
 
-export function close(topic: string) {
-  if (!topics.has(topic)) {
+type Connection = {
+  EventSource?: any;
+  headers?: {[key: string]: string};
+  withCredentials?: boolean;
+}
+
+type Hub = {
+  topics: Map<string, Set<Subscriber<any>>>;
+  connection: Connection;
+  lastEventId?: string;
+  eventSource?: any;
+}
+
+const hubs = new Map<string, Hub>()
+const registrations = new Map<string, Set<string>>()
+
+function subscribers(hub: Hub): Set<Subscriber<any>> {
+  const all = new Set<Subscriber<any>>()
+  hub.topics.forEach((topicSubscribers) => topicSubscribers.forEach((subscriber) => all.add(subscriber)))
+
+  return all
+}
+
+function listen(mercureUrl: string) {
+  const hub = hubs.get(mercureUrl)
+  if (hub === undefined) {
     return
   }
 
-  const mercureUrl = topics.get(topic)
-  topics.delete(topic)
-  const ee = eventSources.get(mercureUrl)
-  listen(mercureUrl, ee.options)
+  if (hub.eventSource) {
+    hub.eventSource.close()
+    hub.eventSource = undefined
+  }
+
+  if (hub.topics.size === 0) {
+    hubs.delete(mercureUrl)
+
+    return
+  }
+
+  const url = new URL(mercureUrl)
+  hub.topics.forEach((_, topic) => {
+    url.searchParams.append('match', topic)
+  })
+
+  const headers: {[key: string]: string} = {...hub.connection.headers}
+  if (hub.lastEventId) {
+    headers['Last-Event-ID'] = hub.lastEventId
+  }
+
+  hub.eventSource = new (hub.connection.EventSource ?? EventSource)(url.toString(), {
+    withCredentials: hub.connection.withCredentials !== undefined ? hub.connection.withCredentials : true,
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => fetch(input, {...init, headers: {...headers, ...init?.headers}}),
+    headers,
+  });
+
+  hub.eventSource.onmessage = (event: MessageEvent) => {
+    hub.lastEventId = event.lastEventId
+    subscribers(hub).forEach((subscriber) => {
+      if (!subscriber.onUpdate) {
+        return
+      }
+
+      try {
+        subscriber.onUpdate(subscriber.rawEvent ? event : JSON.parse(event.data))
+      } catch (e) {
+        subscriber.onError && subscriber.onError(e)
+      }
+    })
+  }
+
+  hub.eventSource.onerror = (error: unknown) => {
+    subscribers(hub).forEach((subscriber) => subscriber.onError && subscriber.onError(error))
+  }
+}
+
+export function close(topic: string) {
+  const mercureUrls = registrations.get(topic)
+  if (mercureUrls === undefined) {
+    return
+  }
+
+  registrations.delete(topic)
+  mercureUrls.forEach((mercureUrl) => {
+    hubs.get(mercureUrl)?.topics.delete(topic)
+    listen(mercureUrl)
+  })
+}
+
+function subscribe<T>(mercureUrl: string, topic: string, opts: Options<T>) {
+  let hub = hubs.get(mercureUrl)
+  if (hub === undefined) {
+    hub = {
+      topics: new Map<string, Set<Subscriber<any>>>(),
+      connection: {EventSource: opts.EventSource, headers: opts.headers, withCredentials: opts.withCredentials},
+    }
+    hubs.set(mercureUrl, hub)
+  }
+
+  const subscriber: Subscriber<T> = {rawEvent: opts.rawEvent, onError: opts.onError, onUpdate: opts.onUpdate}
+  const registration = registrations.get(topic) ?? new Set<string>()
+  registration.add(mercureUrl)
+  registrations.set(topic, registration)
+
+  const existing = hub.topics.get(topic)
+  if (existing) {
+    existing.add(subscriber)
+
+    return
+  }
+
+  hub.topics.set(topic, new Set([subscriber]))
+  listen(mercureUrl)
 }
 
 export default async function mercure<T>(url: string, opts: Options<T>) {
@@ -89,11 +152,9 @@ export default async function mercure<T>(url: string, opts: Options<T>) {
         });
 
       if (mercureUrl) {
-        topics.set(topic === undefined ? url : topic, mercureUrl)
-        listen(mercureUrl, opts)
+        subscribe(mercureUrl, topic === undefined ? url : topic, opts)
       }
 
       return res;
     });
 }
-

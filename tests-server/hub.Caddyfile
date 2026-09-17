@@ -1,0 +1,19 @@
+{
+	order mercure after encode
+}
+
+localhost:8443 {
+  mercure {
+    anonymous
+    cors_origins https://localhost
+    resource_identifier https://localhost:8443/.well-known/mercure
+    issuer https://localhost {
+      publisher {
+        jwt key HS256
+      }
+      subscriber {
+        jwt key HS256
+      }
+    }
+  }
+}
